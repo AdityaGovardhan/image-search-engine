@@ -2,7 +2,9 @@
 name: img-search
 channels:
   - defaults
+  - conda-forge
 dependencies:
   - python=3.7
   - numpy
   - django
+  - django-crispy-forms
