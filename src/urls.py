@@ -10,7 +10,7 @@ urlpatterns = [
     path('execute_task1', tasks.execute_task1, name='ExecuteTask1'),
 
     path('task2', tasks.Task2.as_view(), name='task2'),
-    path('execute_task1', tasks.execute_task1, name='ExecuteTask2'),
+    path('execute_task1', tasks.execute_task2, name='ExecuteTask2'),
 
     path('task3', tasks.Task3.as_view(), name='task3'),
     path('execute_task3', tasks.execute_task3, name='ExecuteTask3'),
