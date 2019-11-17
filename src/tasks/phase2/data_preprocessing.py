@@ -1,10 +1,6 @@
 from database_connection import DatabaseConnection
 import os
-# from color_moments import ColorMoments
 from histogram_of_gradients import HistogramOfGradients
-from scale_invariant_feature_transformation import Sift
-from color_moments import ColorMoments
-from local_binary_pattern import LocalBinaryPattern
 from multiprocessing import Process
 from utils import get_image_directory
 
