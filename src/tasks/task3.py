@@ -22,5 +22,5 @@ def execute_task3(request):
     return HttpResponse('You received a response'+json.dumps(similar_objects), status=200)
     # pass
 
-def get_image_similarity_matrxi(k, method = "LSH"):
+def get_image_similarity_matrix(k, method = "LSH"):
     pass

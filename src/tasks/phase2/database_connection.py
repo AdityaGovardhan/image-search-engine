@@ -73,10 +73,8 @@ class DatabaseConnection:
         subject_feature_dict={}
         connection = self.get_db_connection()
         cursor = connection.cursor()
-        search_feature=np.array(0)
 
         for subject_id in subject_id_list:
-            # print(subject_id)
             cursor.execute("SELECT features from {0} natural join metadata where id={1};".format(tablename, subject_id))
             result_row=cursor.fetchall()
             aggregated_feature_vectors=np.array([pickle.loads(i[0]) for i in result_row])
@@ -101,34 +99,6 @@ class DatabaseConnection:
             subject_id_list+=[subject_id[0] for i in result_column]
 
         return image_score_tuple_list,subject_id_list
-
-    ##### Temporarily for task 6 #########
-    def get_feture_all_subjects(self,tablename):
-        connection = self.get_db_connection()
-        cursor = connection.cursor()
-        query ="SELECT meta.id,feat_table.features FROM "+tablename+" as feat_table join metadata as meta on " \
-                                                                    "feat_table.imagename = meta.imagename"
-        cursor.execute(query)
-        db_output = cursor.fetchall()
-        obj_feature_matrix = {}
-        for image_row in db_output:
-            if(not image_row[0] in  obj_feature_matrix):
-                obj_feature_matrix[image_row[0]] = []
-            obj_feature_matrix[image_row[0]].append(pickle.loads(image_row[1]))
-        return obj_feature_matrix
-    
-
-    def get_all_subjects(self,tablename):
-        connection = self.get_db_connection()
-        cursor = connection.cursor()
-        query ="SELECT meta.id,count(feat_table.imagename) FROM "+tablename+" as feat_table join metadata as meta on " \
-                                                                            "feat_table.imagename = meta.imagename " \
-                                                                            "group by meta.id"
-        cursor.execute(query)
-        db_output = cursor.fetchall()
-        return db_output
-
-    #### end ################################    
 
     def get_object_feature_matrix_from_db(self, tablename, label=None, label_type=None):
         """
@@ -171,7 +141,6 @@ class DatabaseConnection:
                                                                                    get(label_type), tuple(image_names))
         cursor.execute(query)
         result = cursor.fetchall()
-        # print("res = ",result)
         return result
 
     def get_metadata_for_task_8(self,image_names=None):
@@ -189,5 +158,4 @@ if __name__ == "__main__":
     database_connection = DatabaseConnection()
     conn = database_connection.get_db_connection()
     o_f_mat = database_connection.get_object_feature_matrix_from_db('color_moments')['data_matrix'].shape
-    print(database_connection.get_feature_data_for_image('color_moments', 'Hand_0008110.jpg'))
-    print(o_f_mat)
+

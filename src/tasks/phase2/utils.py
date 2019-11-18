@@ -18,34 +18,6 @@ def get_image_directory():
 def get_euclidian_distance(vector1, vector2):
     return np.linalg.norm(vector1 - vector2)
 
-# TODO: to be removed entirely? BOW?
-def sift_euclidean_comparison(t_db, t_image, image_name_list):
-
-    t = 0
-    file_dict = dict()
-    while t < t_db.shape[0]:
-        
-        q_image = t_image
-        db_image = t_db[t: t + 32]
-        file_name = image_name_list[t // 32]
-
-        min_dists = []
-        for query_img_feat in q_image:
-            min_dist = np.inf
-            for db_img_feat in db_image:
-                dist = np.linalg.norm(query_img_feat - db_img_feat)
-                if dist < min_dist:
-                    min_dist = dist
-            min_dists.append(min_dist)
-
-        sum_of_distances = sum(min_dists)
-
-        file_dict[file_name] = sum_of_distances
-
-        t += 32
-
-    for w in sorted(file_dict, key=file_dict.get):
-        print(w, "=", file_dict[w])
 
 def read_from_database(model,label=None):
     database_connection = DatabaseConnection()
@@ -67,14 +39,12 @@ def plot_the_image_on_canvas(row, col, title, imageID, index, figNum = 100, show
     img = cv2.imread(imageID)
     RGB_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     plt.imshow(RGB_img)
-    # plt.axis('off')
     if(showIndex):
         plt.xticks([])
         plt.yticks([])
         plt.ylabel(index)
     else:
         plt.axis('off')
-        # plt.ylabel(index)
     plt.title(title)
 
 
@@ -116,12 +86,6 @@ def plot_the_result(top_m_tuples, folder_path, m, notScores = False, subject_id_
         index += 1
         j+=1
     plt.suptitle(query_image_title)
-    # mng = plt.get_current_fig_manager()
-    # mng.window.state('zoomed')  # works fine on Windows!
-    # mng = plt.get_current_fig_manager()
-    # mng.window.showMaximized()
-    # plt.tight_layout()
-    # mng.window.state('zoomed')
 
     plt.savefig("{0}{1}.png".format(output_image_path, "_".join(query_image_title.split())))
     plt.show()
@@ -228,42 +192,26 @@ def visualize_data_latent_semantics(latent_semantics, image_list, k, top_x=10, t
     col = k
     sorted_tuples_images = []
 
-    feature_image_map = {}
-    # print(latent_semantics.shape)
     for each_semantic in latent_semantics:
-        # print(each_semantic)
         latent_semantic = dict(enumerate(each_semantic))
-        # pprint.pprint(latent_semantic)
         sorted_list = sorted(latent_semantic.items(), key=lambda kv: kv[1], reverse=True)
         size_of_list = len(sorted_list)
         sorted_list = sorted_list[:(top_x//2)] + sorted_list[(size_of_list-(top_x//2)):]
-        # pprint.pprint(sorted_list)
         tuples_per_latent = []
-        # print(len(sorted_list))
-        # pprint.pprint(sorted_list)
-        latent_feature_vectors = {}
-        image_feature_map = collections.defaultdict(list)
         for tuple in sorted_list:
             tuples_per_latent.append((image_list[tuple[0]],tuple[1]))
         sorted_tuples_images.append(tuples_per_latent)
 
     sorted_tuples_images = list(map(list, zip(*sorted_tuples_images)))
-    # print("sorteddddddddddd")
-    # pprint.pprint(sorted_tuples_images)
     index = 1
     folder_path = get_image_directory()
     flattened_sorted_tuples_images = list(itertools.chain(*sorted_tuples_images))
-    # print("flatttenedddd")
-    # pprint.pprint(flattened_sorted_tuples_images)
+
 
     for key, v in flattened_sorted_tuples_images:
         plot_the_image_on_canvas(row, col, str(np.around(v, 4)), folder_path + "/" + key, index)
         index += 1
     plt.suptitle(title+"\n"+"X-axis: Top 15 latent semantics, Y-axis: 5 highest and 5 lowest weight data objects")
-    # plt.legend([])
-
-    # mng = plt.get_current_fig_manager()
-    # mng.window.state('zoomed')  # works fine on Windows!
     plt.savefig("{0}{1}.png".format(output_image_path, "_".join(title.split())), dpi=500)
     plt.show()
     
@@ -282,7 +230,6 @@ def plot_scree_test(eigen_values):
                      shadow=False, prop=matplotlib.font_manager.FontProperties(size='small'),
                      markerscale=0.4)
     leg.get_frame().set_alpha(0.4)
-    #leg.draggable()
     plt.show()
 
 def visualize_feature_semantics(latent_semantics, image_list, k, title = "Results", data_in_latent_space = None):
@@ -313,7 +260,6 @@ def visualize_feature_semantics(latent_semantics, image_list, k, title = "Result
         closest_image = get_top_m_tuples_by_similarity_score(data_in_latent_space,
                                                              each_semantic, image_list,
                                                              1, "cosine")
-        # pprint.pprint(closest_image)
         sorted_tuples_images.append(closest_image[0])
     index = 1
     folder_path = get_image_directory()
@@ -323,19 +269,12 @@ def visualize_feature_semantics(latent_semantics, image_list, k, title = "Result
         index += 1
     plt.suptitle(title)
 
-    # mng = plt.get_current_fig_manager()
-
-    # mng.window.state('zoomed')
     plt.savefig("{0}{1}.png".format(output_image_path, "_".join(title.split())))
     plt.show()
 
 
 def transform_cm(original_cm):
     min_val = np.amin(original_cm)
-    print("orig ",original_cm.shape)
     tranformed_cm = original_cm + abs(min_val)
-    print("trans ", tranformed_cm.shape)
-    # pprint.pprint(tranformed_cm)
-    # pprint.pprint(np.amin(tranformed_cm))
     return tranformed_cm
 
