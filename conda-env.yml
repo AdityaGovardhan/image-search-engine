@@ -8,3 +8,14 @@ dependencies:
   - numpy
   - django
   - django-crispy-forms
+  - scipy
+  - pandas
+  - matplotlib
+  - seaborn
+  - scikit-image
+  - psycopg2
+  - opencv
+  - pyfiglet
+  - tabulate
+  - termcolor
+  - scikit-learn
