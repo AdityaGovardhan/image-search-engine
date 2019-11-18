@@ -137,11 +137,5 @@ class SingularValueDecomposition:
 
 
 if __name__ == "__main__":
-    # dbconnection = DatabaseConnection()
     svd_object = SingularValueDecomposition()
-    # all_image_hog_features = dbconnection.get_object_feature_matrix_from_db(
-    #     tablename='local_binary_pattern')
-    # print(all_image_hog_features.get('data_matrix').shape)
-    # u, s, vt = svd_object.get_latent_semantics(all_image_hog_features.get('data_matrix'), 10)
     svd_object.task6_using_svd(27)
-    # svd_object.trunsvd_hog(10, 'Hand_0000002.jpg')

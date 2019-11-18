@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 
 def get_image_directory():
-    return str(Path(os.getcwd()).parent) + '/Data/images'
+    return str(Path(os.getcwd()).parent) + '\Data\images'
 
 def get_euclidian_distance(vector1, vector2):
     return np.linalg.norm(vector1 - vector2)
@@ -301,9 +301,6 @@ def visualize_feature_semantics(latent_semantics, image_list, k, title = "Result
        :return:
        """
     output_image_path = str(Path(os.getcwd()).parent) + "/Data/Output/"
-    # if (k > 15):
-    #     k = 15
-    #     latent_semantics = latent_semantics[:k]
 
     m_sqrt = sqrt(k)
     row = round(m_sqrt)

@@ -2,3 +2,5 @@
 *workspace.xml
 db.sqlite3
 .idea/*
+*.jpg
+*.csv

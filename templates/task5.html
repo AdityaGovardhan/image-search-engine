@@ -5,7 +5,7 @@
     <div class="container">
     <h2>Task 5</h2>
         <hr>
-    <form action="executeTask5" method="post" novalidate>
+    <form action="{% url 'ExecuteTask5' %}" method="post" novalidate>
         {% csrf_token %}
         {{ form|crispy }}
         <button type="submit" class="btn btn-success" name="execute_task5">execute</button>

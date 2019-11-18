@@ -19,13 +19,7 @@ class DataPreProcessor:
         self.process_metadata()
         feature_models = []
 
-        feature_models.append("color_moments")
-        # feature_models.append("local_binary_pattern")
-        # feature_models.append("histogram_of_gradients")
-        # feature_models.append("scale_invariant_feature_transformation")
-        
-        # for feature in feature_models:
-        #     self.perform_feature_model(feature)
+        feature_models.append("histogram_of_gradients")
 
         processes = []
         for i, feature in enumerate(feature_models):
@@ -56,24 +50,10 @@ class DataPreProcessor:
                         """)
         cursor.execute("""copy metadata from '{}' csv header;""".format(csv_file_path))
         connection.commit()
-        # Insert data from csv file into created database table
-
-        # cursor.execute("Select * from metadata;")
-        # print(cursor.fetchall())
 
     def perform_feature_model(self, feature):
-        if feature == "color_moments":
-            color_moments = ColorMoments()
-            feature_vectors = color_moments.get_image_vectors(self.INPUT_DATA_PATH)
-        elif feature == "local_binary_pattern":
-            local_binary_pattern = LocalBinaryPattern()
-            feature_vectors = local_binary_pattern.get_image_vectors(self.INPUT_DATA_PATH)
-        elif feature == "histogram_of_gradients":
-            histogram_of_gradients = HistogramOfGradients()
-            feature_vectors = histogram_of_gradients.get_image_vectors(self.INPUT_DATA_PATH)
-        elif feature == "scale_invariant_feature_transformation":
-            scale_invariant_feature_transformation = Sift()
-            feature_vectors = scale_invariant_feature_transformation.get_image_vectors(self.INPUT_DATA_PATH)
+        histogram_of_gradients = HistogramOfGradients()
+        feature_vectors = histogram_of_gradients.get_image_vectors(self.INPUT_DATA_PATH)
 
         self.database_connection.create_feature_model_table(feature)
         self.database_connection.insert_feature_data(feature, feature_vectors)

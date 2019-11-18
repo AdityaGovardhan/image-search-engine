@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.views.generic import CreateView
 from src import models
-
+from django.http import HttpResponse
+import json
 
 class Task3(CreateView):
     model = models.Task3Model
@@ -14,5 +15,12 @@ class Task3(CreateView):
         return context
 
 
-def execute_task3():
+def execute_task3(request):
+    print(request.__dict__)
+    print(request.method)
+    similar_objects = {}
+    return HttpResponse('You received a response'+json.dumps(similar_objects), status=200)
+    # pass
+
+def get_image_similarity_matrxi(k, method = "LSH"):
     pass
