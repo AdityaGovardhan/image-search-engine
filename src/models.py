@@ -17,7 +17,7 @@ class Task2Model(models.Model):
 
 
 class Task3Model(models.Model):
-    most_similar_images = models.CharField(max_length=2)
+    most_similar_images = models.CharField(max_length=2, verbose_name = "Number of Most Similar Images")
 
 
 class Task4Model(models.Model):
@@ -29,7 +29,7 @@ class Task5Model(models.Model):
     number_of_hashes_per_layer = models.CharField(max_length=2)
     set_of_vectors = models.CharField(max_length=2)
     query_image = models.CharField(max_length=100)
-    most_similar_images = models.CharField(max_length=2)
+    most_similar_images = models.CharField(max_length=2, verbose_name = "Number of Most Similar Images")
 
 
 
