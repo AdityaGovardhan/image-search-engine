@@ -53,52 +53,8 @@ class DatabaseConnection:
         result_row = cursor.fetchone()
         return np.array(pickle.loads(result_row[0]))
 
-    def get_subject_ids_in_db(self, tablename):
-        """
-        Returns the feature vector for an image for a model
-        Output Shape: [feature vector]
-        """
-        connection = self.get_db_connection()
-        cursor = connection.cursor()
-        cursor.execute("SELECT id from {0} natural join metadata group by id ORDER BY id;".format(tablename))
-        result_row = cursor.fetchall()
-        subject_id_list=[i[0] for i in result_row]        
-        return subject_id_list
 
-    def generate_average_feature_vectors_for_every_subject(self,subject_id_list, tablename):
-        """
-        Returns average feature vectors for all subjects in DB
-        & the average feature vector for the search subject id
-        """
-        subject_feature_dict={}
-        connection = self.get_db_connection()
-        cursor = connection.cursor()
 
-        for subject_id in subject_id_list:
-            cursor.execute("SELECT features from {0} natural join metadata where id={1};".format(tablename, subject_id))
-            result_row=cursor.fetchall()
-            aggregated_feature_vectors=np.array([pickle.loads(i[0]) for i in result_row])
-            average_feature_vectors=np.average(aggregated_feature_vectors,axis=0)           
-            
-            subject_feature_dict[subject_id]=average_feature_vectors
-
-        return subject_feature_dict
-
-    def get_images_related_to_subject(self,subject_list,tablename):
-        """
-        """
-        image_score_tuple_list=[]
-        connection = self.get_db_connection()
-        cursor = connection.cursor()
-        subject_id_list = []
-        for subject_id in subject_list:
-            cursor.execute("SELECT imagename from {0} natural join metadata where id={1};".format(tablename,
-                                                                                                  subject_id[0]))
-            result_column=cursor.fetchall()
-            image_score_tuple_list+=[(i[0],subject_id[1]) for i in result_column]
-            subject_id_list+=[subject_id[0] for i in result_column]
-
-        return image_score_tuple_list,subject_id_list
 
     def get_object_feature_matrix_from_db(self, tablename, label=None, label_type=None):
         """

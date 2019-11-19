@@ -35,7 +35,3 @@ class HistogramOfGradients:
 
 if __name__ == "__main__":
     hog = HistogramOfGradients()
-    folder_path = "./../Data/CSE 515 Fall19 - Smaller Dataset"
-    image_dict = hog.get_image_vectors(folder_path)
-    pprint.pprint(image_dict)
-
