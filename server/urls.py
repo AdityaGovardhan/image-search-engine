@@ -21,5 +21,5 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('image_search_engine_app/', include('src.urls')),
+    path('', include('src.urls')),
 ]
