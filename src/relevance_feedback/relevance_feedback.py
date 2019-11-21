@@ -56,6 +56,15 @@ class RelevanceFeedback:
 
 		return rel_items,irl_items
 
+	def get_SVM_based_feedback(self):
+		pass
+
+	def get_Dec_Tree_based_feedback(self):
+		pass
+
+	def get_PPR_based_feedback(self):
+		pass		
+
 if __name__ == '__main__':		
 	rf=RelevanceFeedback()
 	q_name='Hand_0000012.jpg'
