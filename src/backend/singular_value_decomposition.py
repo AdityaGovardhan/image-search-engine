@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, '../backend')
+
 from database_connection import DatabaseConnection
 from histogram_of_gradients import HistogramOfGradients
 # from . import database_connection, histogram_of_gradients
@@ -9,7 +12,6 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import TruncatedSVD
 
 
-# Is a temperarory class design
 class SingularValueDecomposition:
 
     def __init__(self):
@@ -17,11 +19,14 @@ class SingularValueDecomposition:
         pass
 
     def get_latent_semantics(self, data_matrix, n_components):
-        u, s, vt = np.linalg.svd(data_matrix,full_matrices=False)
-        u = np.matrix(u[:,:n_components])
+        u, s, vt = self.get_svd_decomposition(data_matrix)
+        u = np.array(u[:,:n_components])
         s = np.diag(s[:n_components])
-        vt = np.matrix(vt[:n_components,:])
-        # plot_scree_test(np.diagonal(s))
+        vt = np.array(vt[:n_components,:])
+        return u, s, vt
+
+    def get_svd_decomposition(self, data_matrix):
+        u, s, vt = np.linalg.svd(data_matrix, full_matrices=False)
         return u, s, vt
 
 
