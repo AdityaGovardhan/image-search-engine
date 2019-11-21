@@ -18,8 +18,6 @@ class Task3(CreateView):
 
 
 def execute_task3(request):
-    print(request.__dict__)
-    print(request.method)
     similar_objects = {}
     return HttpResponse('You received a response'+json.dumps(similar_objects), status=200)
     # pass

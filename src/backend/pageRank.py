@@ -1,12 +1,11 @@
 import sys, os
-sys.path.insert(0, '..')
 
-from backend.database_connection import DatabaseConnection
-from backend.singular_value_decomposition import SingularValueDecomposition
+from database_connection import DatabaseConnection
+from singular_value_decomposition import SingularValueDecomposition
 import numpy as np
 from pprint import pprint
 from sklearn.preprocessing import normalize
-from backend.utils import (ALPHA, read_from_pickle, get_pickle_directory, save_to_pickle,
+from utils import (ALPHA, read_from_pickle, get_pickle_directory, save_to_pickle,
                            PICKLE_FILE_NAME)
 
 
@@ -16,7 +15,6 @@ class PageRank:
         all_data_dict = db_conn.get_object_feature_matrix_from_db("histogram_of_gradients")
         self.data_matrix = all_data_dict['data_matrix']
         self.imageIDs = np.array(all_data_dict['images'])
-        pass
 
     def get_image_similarity_matrix(self, k):
         data_matrix = self.data_matrix
@@ -25,9 +23,7 @@ class PageRank:
         u = np.array(u)
         s = np.diag(s)
         extracted_features = np.matmul(u,s)
-
         image_distance_matrix = np.array([])
-
         for each_row in extracted_features:
             sub_matrix = np.subtract(extracted_features, each_row)
             euc_dist = np.linalg.norm(sub_matrix, axis = 1, keepdims=True)
@@ -38,7 +34,6 @@ class PageRank:
 
         image_distance_matrix[image_distance_matrix == 0] = 1
 
-        pprint(image_distance_matrix)
         n = image_distance_matrix.shape[1]
         image_similarity_matrix = np.reciprocal(image_distance_matrix)
 
