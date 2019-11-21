@@ -1,8 +1,8 @@
-from backend.database_connection import DatabaseConnection
+from database_connection import DatabaseConnection
 import os
-from backend.histogram_of_gradients import HistogramOfGradients
+from histogram_of_gradients import HistogramOfGradients
 from multiprocessing import Process
-from backend.utils import get_image_directory
+from utils import get_image_directory
 
 
 class DataPreProcessor:

@@ -5,10 +5,10 @@ from itertools import repeat
 import pickle
 
 import os,sys,inspect
-sys.path.insert(0, '..')
-from backend import singular_value_decomposition
-from backend.database_connection import DatabaseConnection
-from backend.utils import get_most_m_similar_images
+sys.path.insert(0, '../backend/')
+import singular_value_decomposition
+from database_connection import DatabaseConnection
+from utils import get_most_m_similar_images
 
 class RelevanceFeedback:
 

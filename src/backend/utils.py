@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import cv2,  os
 from math import sqrt
-from backend.database_connection import DatabaseConnection
+from database_connection import DatabaseConnection
 import psycopg2
 import itertools
 import collections
