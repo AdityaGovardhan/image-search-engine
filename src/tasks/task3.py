@@ -4,6 +4,8 @@ from src import models
 from django.http import HttpResponse
 import json
 
+
+
 class Task3(CreateView):
     model = models.Task3Model
     fields = ('most_similar_images',)
@@ -21,6 +23,3 @@ def execute_task3(request):
     similar_objects = {}
     return HttpResponse('You received a response'+json.dumps(similar_objects), status=200)
     # pass
-
-def get_image_similarity_matrix(k, method = "LSH"):
-    pass
