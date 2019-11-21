@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 from scipy import spatial
 import matplotlib.pyplot as plt
@@ -13,13 +15,13 @@ ALPHA = 0.85
 PICKLE_FILE_NAME = "page_rank_interim.pickle"
 
 def get_image_directory():
-    path = str(Path(str(Path(os.getcwd()).parent) + '/Data/images'))
+    path = str(Path(str(Path(os.getcwd())) + '/src/Data/images'))
     if (not os.path.exists(path)):
         os.mkdir(path)
     return path
 
 def get_pickle_directory():
-    path = str(Path(str(Path(os.getcwd()).parent) + '/Data/pickle'))
+    path = str(Path(str(Path(os.getcwd())) + '/src/Data/pickle'))
     if(not os.path.exists(path)):
         os.mkdir(path)
     return path

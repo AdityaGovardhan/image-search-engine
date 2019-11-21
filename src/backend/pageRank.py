@@ -1,4 +1,5 @@
 import sys, os
+sys.path.insert(0,'src/backend')
 
 from database_connection import DatabaseConnection
 from singular_value_decomposition import SingularValueDecomposition

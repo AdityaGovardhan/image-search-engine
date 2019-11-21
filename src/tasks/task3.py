@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, 'src')
+
 from django.shortcuts import render
 from django.views.generic import CreateView
 from src import models
@@ -5,6 +8,9 @@ from django.http import HttpResponse
 import json
 
 
+from backend.pageRank import PageRank
+from django.shortcuts import render
+from backend.utils import get_pickle_directory
 
 class Task3(CreateView):
     model = models.Task3Model
@@ -19,5 +25,9 @@ class Task3(CreateView):
 
 def execute_task3(request):
     similar_objects = {}
-    return HttpResponse('You received a response'+json.dumps(similar_objects), status=200)
+    pg_obj = PageRank()
+    dominant_images = pg_obj.get_K_dominant_images(5, 4, ['Hand_0011685.jpg', 'Hand_0011694.jpg', 'Hand_0009446.jpg'])
+
+    # return HttpResponse('You received a response'+json.dumps(similar_objects), status=200)
+    return render(request, 'visualize_images.html', {'images': dominant_images})
     # pass
