@@ -31,7 +31,7 @@ class DataPreProcessor:
 
     # This function will read all the metadata of input images and put those metadata details in database.
     def process_metadata(self):
-        csv_file_path = os.getcwd()[:-6] + '/Data/HandInfo.csv'
+        csv_file_path = os.getcwd()[:-7] + '/Data/HandInfo.csv'
         connection = self.database_connection.get_db_connection()
         cursor = connection.cursor()
         cursor.execute("""DROP Table IF EXISTS metadata;""")
