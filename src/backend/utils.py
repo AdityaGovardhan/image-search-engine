@@ -15,10 +15,6 @@ from pathlib import Path
 def get_image_directory():
     return str(Path(os.getcwd()).parent) + '/Data/images'
 
-def get_euclidian_distance(vector1, vector2):
-    return np.linalg.norm(vector1 - vector2)
-
-
 def read_from_database(model,label=None):
     database_connection = DatabaseConnection()
    
@@ -32,7 +28,6 @@ def get_dot_distance(vector1, vector2):
 
 def get_cosine_similarity(vector1, vector2):
     return spatial.distance.cosine(vector1, vector2)
-
 
 
 def plot_scree_test(eigen_values):
@@ -65,7 +60,8 @@ def get_most_m_similar_images(data_with_images, query_image_feature_vector, Vt, 
     imageNames = data_with_images.get('images')
     database_images_latent_vectors = np.dot(db_data_matrix, np.transpose(Vt))
     query_image_latent_vector = np.dot(np.array(query_image_feature_vector),Vt.T)
-    return get_top_m_tuples_by_similarity_score(database_images_latent_vectors, query_image_latent_vector, imageNames, m+1) #+1 because the db contains the query image also
+    return get_top_m_tuples_by_similarity_score(database_images_latent_vectors, 
+                                query_image_latent_vector, imageNames, m+1) #+1 because the db contains the query image also
 
 def get_top_m_tuples_by_similarity_score(database_images_latent_vectors, query_image_latent_vector, imageNames, m, distance_measure = "Euclidean"):
     similar_images = get_similarity_score(database_images_latent_vectors, query_image_latent_vector, imageNames, distance_measure)
@@ -104,6 +100,4 @@ def get_euclidian_distance(vector1, vector2):
 
 def get_dot_distance(vector1, vector2):
     return np.dot(vector1, vector2)
-
-def get_cosine_similarity(vector1, vector2):
-    return spatial.distance.cosine(vector1, vector2)        
+     

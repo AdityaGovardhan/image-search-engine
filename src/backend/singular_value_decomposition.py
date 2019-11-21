@@ -1,5 +1,6 @@
 from database_connection import DatabaseConnection
 from histogram_of_gradients import HistogramOfGradients
+# from . import database_connection, histogram_of_gradients
 import pprint
 import numpy as np
 from utils import plot_scree_test

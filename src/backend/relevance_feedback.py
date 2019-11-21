@@ -5,7 +5,7 @@ from itertools import repeat
 import pickle
 
 import os,sys,inspect
-sys.path.insert(0, '../backend/')
+# sys.path.insert(0, '../backend/')
 import singular_value_decomposition
 from database_connection import DatabaseConnection
 from utils import get_most_m_similar_images
@@ -15,7 +15,7 @@ class RelevanceFeedback:
 	def __init__(self):
 		self.database_connection = DatabaseConnection()
 		self.conn = self.database_connection.get_db_connection()
-		print('Initiating RelevanceFeedback')
+		print('Initiating RelevanceFeedback....')
 
 	def compute_new_query_vector(self,q_old,relevant_items,irrel_items,alpha=0.5,beta=0.45,gamma=0.05):
 		print('Computing new query vector.....')
@@ -74,8 +74,6 @@ if __name__ == '__main__':
 	svd=singular_value_decomposition.SingularValueDecomposition()
 	U,S,Vt=svd.get_latent_semantics(data_matrix=data_matrix,n_components=25)
 	init_rank_list=get_most_m_similar_images(data_with_images=obj_feature_matrix,query_image_feature_vector=q,Vt=Vt,m=5)
-	print(f'Initial List= {init_rank_list}')
 	rel_items,irl_items=rf.get_user_feedback(init_rank_list=init_rank_list,q_name=q_name)
 	q_new=rf.compute_new_query_vector(q_old=q,relevant_items=rel_items,irrel_items=irl_items)
 	new_rank_list=get_most_m_similar_images(data_with_images=obj_feature_matrix,query_image_feature_vector=q_new,Vt=Vt,m=5)
-	print(f'New List= {new_rank_list}')
