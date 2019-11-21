@@ -1,8 +1,8 @@
-from database_connection import DatabaseConnection
-from histogram_of_gradients import HistogramOfGradients
+from backend.database_connection import DatabaseConnection
+from backend.histogram_of_gradients import HistogramOfGradients
 import pprint
 import numpy as np
-from utils import visualize_images,plot_scree_test
+from backend.utils import plot_scree_test
 import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.decomposition import TruncatedSVD

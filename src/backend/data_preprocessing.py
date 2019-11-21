@@ -1,8 +1,8 @@
-from database_connection import DatabaseConnection
+from backend.database_connection import DatabaseConnection
 import os
-from histogram_of_gradients import HistogramOfGradients
+from backend.histogram_of_gradients import HistogramOfGradients
 from multiprocessing import Process
-from utils import get_image_directory
+from backend.utils import get_image_directory
 
 
 class DataPreProcessor:
@@ -31,7 +31,7 @@ class DataPreProcessor:
 
     # This function will read all the metadata of input images and put those metadata details in database.
     def process_metadata(self):
-        csv_file_path = os.getcwd()[:-6] + '/Data/HandInfo.csv'
+        csv_file_path = os.getcwd()[:-7] + '/Data/HandInfo.csv'
         connection = self.database_connection.get_db_connection()
         cursor = connection.cursor()
         cursor.execute("""DROP Table IF EXISTS metadata;""")
