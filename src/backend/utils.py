@@ -1,5 +1,6 @@
 import sys
 
+import glob
 import numpy as np
 from scipy import spatial
 import matplotlib.pyplot as plt
@@ -9,21 +10,28 @@ from database_connection import DatabaseConnection
 import os
 from pathlib import Path
 import pickle
+from backend.singular_value_decomposition import SingularValueDecomposition
 
 
 ALPHA = 0.85
 PICKLE_FILE_NAME = "page_rank_interim.pickle"
 
 def get_image_directory():
-    path = str(Path(str(Path(os.getcwd())) + '/src/Data/images'))
+    data_dir = get_data_directory()
+    path = str(Path(data_dir + '/images'))
     if (not os.path.exists(path)):
         os.mkdir(path)
     return path
 
 def get_pickle_directory():
-    path = str(Path(str(Path(os.getcwd())) + '/src/Data/pickle'))
+    data_dir = get_data_directory()
+    path = str(Path(data_dir + '/pickle'))
     if(not os.path.exists(path)):
         os.mkdir(path)
+    return path
+
+def get_data_directory():
+    path = str(Path(os.getcwd() + '/src/Data'))
     return path
 
 def get_euclidian_distance(vector1, vector2):
@@ -123,3 +131,32 @@ def read_from_pickle(file_name):
         data = pickle.load(f)
     f.close()
     return data
+
+def get_image_names_in_a_folder(relative_folder_path):
+    """
+    Author: Vibhu Varshney
+    :param relative_folder_path: here give the path with a '/' ahead e.g. '/Labelled/Set 2'
+    :return:
+    list of image names
+    """
+
+    data_dir = get_data_directory()
+    path = str(Path(data_dir + relative_folder_path)) + '\*.jpg'
+    files = glob.glob(path)
+    image_names = [os.path.basename(x) for x in files]
+    return image_names
+
+def get_svd_image_data_from_folder(relative_folder_path):
+    """
+
+    :param relative_folder_path: here give the path with a '/' ahead e.g. '/Labelled/Set2'
+    :return:
+    data_matrix after applying SVD on it and also the image names present inside the relative_folder_path
+    """
+    image_names = get_image_names_in_a_folder(relative_folder_path)
+    db_conn = DatabaseConnection()
+    data_image_dict = db_conn.HOG_descriptor_from_image_ids(image_names)
+    data_matrix = data_image_dict['data_matrix']
+    svd_obj = SingularValueDecomposition()
+    svd_image_data = svd_obj.get_transformed_data(data_matrix)
+    return svd_image_data, image_names

@@ -26,8 +26,10 @@ class Task3(CreateView):
 def execute_task3(request):
     similar_objects = {}
     pg_obj = PageRank()
-    dominant_images = pg_obj.get_K_dominant_images(5, 4, ['Hand_0011685.jpg', 'Hand_0011694.jpg', 'Hand_0009446.jpg'])
-
+    #Query 1 use the images from Labelled/Set2
+    # dominant_images = pg_obj.get_K_dominant_images(5, 10, ["Hand_0008333.jpg", "Hand_0006183.jpg", "Hand_0000074.jpg"])
+    dominant_images = pg_obj.get_K_dominant_images(5, 8, ['Hand_0011685.jpg', 'Hand_0011694.jpg', 'Hand_0009446.jpg'], "/Labelled/Set2")
+    # dominant_images = pg_obj.get_K_dominant_images(5, 8, ['Hand_0011364.jpg'])
     # return HttpResponse('You received a response'+json.dumps(similar_objects), status=200)
     return render(request, 'visualize_images.html', {'images': dominant_images})
     # pass

@@ -109,6 +109,21 @@ class DatabaseConnection:
         result = cursor.fetchall()
         return result
 
+    def HOG_descriptor_from_image_ids(self, image_ids):
+        tablename = "histogram_of_gradients"
+        connection = self.get_db_connection()
+        cursor = connection.cursor()
+        query = "SELECT * FROM {0} WHERE imagename IN {1}".format(tablename, tuple(image_ids))
+        cursor.execute(query)
+        db_output = cursor.fetchall()
+        obj_feature_matrix = []
+        images = []
+        for image_row in db_output:
+            images.append(image_row[0])
+            obj_feature_matrix.extend(pickle.loads(image_row[1]))
+        return {"images": images, "data_matrix": np.array(obj_feature_matrix)}
+
+
 
 if __name__ == "__main__":
     database_connection = DatabaseConnection()
