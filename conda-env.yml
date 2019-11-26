@@ -19,3 +19,4 @@ dependencies:
   - tabulate
   - termcolor
   - scikit-learn
+  - cvxopt
