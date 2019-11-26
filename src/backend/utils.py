@@ -16,13 +16,6 @@ from backend.singular_value_decomposition import SingularValueDecomposition
 ALPHA = 0.85
 PICKLE_FILE_NAME = "page_rank_interim.pickle"
 
-def get_image_directory():
-    data_dir = get_data_directory()
-    path = str(Path(data_dir + '/images'))
-    if (not os.path.exists(path)):
-        os.mkdir(path)
-    return path
-
 def get_pickle_directory():
     data_dir = get_data_directory()
     path = str(Path(data_dir + '/pickle'))
@@ -33,6 +26,15 @@ def get_pickle_directory():
 def get_data_directory():
     path = str(Path(os.getcwd() + '/src/Data'))
     return path
+
+def get_euclidian_distance(vector1, vector2):
+    return np.linalg.norm(vector1 - vector2)
+
+def get_image_directory(content_type='database_images'):
+    if content_type == 'database_images':
+        return str(Path(os.getcwd()).parent) + '/Data/images'
+    elif content_type == 'classification_images':
+        return str(Path(os.getcwd()).parent) + '/Data/phase3_sample_data'
 
 def read_from_database(model,label=None):
     database_connection = DatabaseConnection()
