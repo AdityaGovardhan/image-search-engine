@@ -22,10 +22,10 @@ class SingularValueDecomposition:
         u, s, vt = np.linalg.svd(data_matrix, full_matrices=False)
         return u, s, vt
 
-    def get_transformed_data(self, data_matrix):
+    def get_transformed_data(self, data_matrix, k=10):
         u, s, vt = self.get_svd_decomposition(data_matrix)
-        u = np.array(u)
-        s = np.diag(s)
+        u = np.array(u[:,:k])
+        s = np.diag(s[:k])
         transformed_data = np.matmul(u, s)
         return transformed_data
 

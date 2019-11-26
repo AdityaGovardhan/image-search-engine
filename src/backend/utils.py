@@ -146,7 +146,7 @@ def get_image_names_in_a_folder(relative_folder_path):
     image_names = [os.path.basename(x) for x in files]
     return image_names
 
-def get_svd_image_data_from_folder(relative_folder_path):
+def get_svd_image_data_from_folder(relative_folder_path, k=8):
     """
 
     :param relative_folder_path: here give the path with a '/' ahead e.g. '/Labelled/Set2'
@@ -157,6 +157,8 @@ def get_svd_image_data_from_folder(relative_folder_path):
     db_conn = DatabaseConnection()
     data_image_dict = db_conn.HOG_descriptor_from_image_ids(image_names)
     data_matrix = data_image_dict['data_matrix']
+    print(image_names)
+    print(data_image_dict['images'])
     svd_obj = SingularValueDecomposition()
-    svd_image_data = svd_obj.get_transformed_data(data_matrix)
-    return svd_image_data, image_names
+    svd_image_data = svd_obj.get_transformed_data(data_matrix, k)
+    return svd_image_data, data_image_dict['images']
