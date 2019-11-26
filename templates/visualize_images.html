@@ -1,3 +1,4 @@
+{% extends 'base.html' %}
 {% load static %}
 
 <!DOCTYPE html>
@@ -6,27 +7,46 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-
+    {% block javascript %}
+    <script src = "{% static 'feedback.js' %}"> </script>
+    {% endblock javascript %}
 </head>
 
 <style>
+    {% block css %}
     .imgContainer{
         float:left;
+        padding: 20px;
     }
+    {% endblock css %}
 </style>
 
 <body>
+    {% block result %}
+        <div id="showResults">
+            <div id="images">
 
+                {% for image in images %}
+                <div class="imgContainer">
+                    <img src="{% static image.0 %}" height="200" width="200"/>
+                    <p>Image: {{ image.0 }}</p>
+                    <p>Score: {{ image.1 }}</p>
+                    {% if from_task == "task6" %}
+                        <label class="btn btn-success active">
+                            <input class="radio_button" type="radio" tag="relevant" name="{{ image.0 }}" id="relevant_{{ image.0 }}" autocomplete="off" unchecked> Relevant
+                        </label>
+                        <label class="btn btn-danger active">
+                            <input class="radio_button" type="radio" tag="irrelevant" name="{{ image.0 }}" id="irrelevant_{{ image.0 }}" autocomplete="off" unchecked> Irrelevant
+                        </label>
+                    {% endif %}
+                </div>
+            {% endfor %}
 
-<div class="image123">
-    {% for image in images %}
-        <div class="imgContainer">
-            <img src="{% static image.1 %}" height="200" width="200"/>
-            <p>Image is {{ image.1 }}</p>
-            <p>Score is {{ image.0 }}</p>
+            </div>
+            {% if from_task == "task6" %}
+                <button id="submit_feedback_button" type="submit" class="btn btn-primary" csrf_token="{{ csrf_token }}" >Submit Feedback</button>
+            {% endif %}
         </div>
-    {% endfor %}
-</div>
-
+    {% endblock result%}
 </body>
 </html>

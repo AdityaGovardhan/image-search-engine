@@ -3,6 +3,8 @@ import os
 from histogram_of_gradients import HistogramOfGradients
 from multiprocessing import Process
 from utils import get_image_directory
+import os
+from pathlib import Path
 
 
 class DataPreProcessor:
@@ -14,7 +16,7 @@ class DataPreProcessor:
         4) Put this latent semantic of each image from each model and technique with its metadata inside database
         '''
 
-        self.INPUT_DATA_PATH = get_image_directory()
+        self.INPUT_DATA_PATH = str(Path(str(Path(os.getcwd()).parent) + "/Data/images/"))
         self.database_connection = DatabaseConnection()
         self.process_metadata()
         feature_models = []
@@ -52,8 +54,8 @@ class DataPreProcessor:
         connection.commit()
 
     def perform_feature_model(self, feature):
-        histogram_of_gradients = HistogramOfGradients()
-        feature_vectors = histogram_of_gradients.get_image_vectors(self.INPUT_DATA_PATH)
+        histogram_of_gradients = HistogramOfGradients(self.INPUT_DATA_PATH)
+        feature_vectors = histogram_of_gradients.get_image_vectors()
 
         self.database_connection.create_feature_model_table(feature)
         self.database_connection.insert_feature_data(feature, feature_vectors)

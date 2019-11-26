@@ -23,5 +23,6 @@ urlpatterns = [
 
     path('task6', tasks.Task6.as_view(), name='task6'),
     path('execute_task6', tasks.execute_task6, name='ExecuteTask6'),
+    path('get_feedback', tasks.process_feedback, name='feedback_processor'),
 
 ]

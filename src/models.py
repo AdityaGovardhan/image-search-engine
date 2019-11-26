@@ -8,6 +8,14 @@ classifiers = (
         ('Personalized Page Rank', 'Personalized Page Rank'),
     )
 
+task_6_relevance_feedbacks = (
+        ('Support Vector Machine', 'Support Vector Machine'),
+        ('Decision Tree Classifier', 'Decision Tree Classifier'),
+        ('Personalized Page Rank', 'Personalized Page Rank'),
+        ('Probabilistic', 'Probabilistic'),
+    )
+
+
 class Task1Model(models.Model):
     number_of_latent_semantics = models.CharField(max_length=2)
 
@@ -34,6 +42,7 @@ class Task5Model(models.Model):
 
 
 class Task6Model(models.Model):
-    pass
+    relevance_feedback = models.CharField(max_length=6, choices=task_6_relevance_feedbacks, default='Probabilistic')
+    # pass
 
 

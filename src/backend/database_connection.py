@@ -53,9 +53,6 @@ class DatabaseConnection:
         result_row = cursor.fetchone()
         return np.array(pickle.loads(result_row[0]))
 
-
-
-
     def get_object_feature_matrix_from_db(self, tablename, label=None, label_type=None):
         """
         Returns the object feature(Data) matrix for dimensionality reduction for a model

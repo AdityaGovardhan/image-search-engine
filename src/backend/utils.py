@@ -10,7 +10,7 @@ from database_connection import DatabaseConnection
 import os
 from pathlib import Path
 import pickle
-from backend.singular_value_decomposition import SingularValueDecomposition
+from singular_value_decomposition import SingularValueDecomposition
 
 
 ALPHA = 0.85
@@ -33,10 +33,6 @@ def get_pickle_directory():
 def get_data_directory():
     path = str(Path(os.getcwd() + '/src/Data'))
     return path
-
-def get_euclidian_distance(vector1, vector2):
-    return np.linalg.norm(vector1 - vector2)
-
 
 def read_from_database(model,label=None):
     database_connection = DatabaseConnection()

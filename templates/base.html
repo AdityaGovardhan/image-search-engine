@@ -1,11 +1,18 @@
 <!Doctype html>
+{% load static %}
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <title>Image Search Engine</title>
-
+    <script src="{% static 'jquery_3.4.1_min.js' %}"></script>
+      <title>Image Search Engine</title>
+    {% block javascript %}
+    {% endblock javascript %}
+      <style>
+          {% block css %}
+          {% endblock css %}
+      </style>
   </head>
   <body>
   <h2>Group 11 Presents Image Search Engine</h2>
@@ -14,5 +21,7 @@
         {% block content %}
         {% endblock %}
   </div>
+  {% block result %}
+  {% endblock result %}
   </body>
 </html>

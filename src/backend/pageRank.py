@@ -68,7 +68,7 @@ class PageRank:
 
     def get_top_K_images_based_on_scores(self, matrix, image_ids, K):
         similarity_scores = list(matrix.flatten())
-        images, scores = list(zip(*sorted(zip(similarity_scores, image_ids), reverse=True)))
+        scores, images = list(zip(*sorted(zip(similarity_scores, image_ids), reverse=True)))
         dominant_images = list(zip(images[:K], scores[:K]))
         return dominant_images
 

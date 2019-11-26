@@ -4,6 +4,7 @@ db.sqlite3
 .idea/*
 *.jpg
 *.csv
-static/*
-staticfiles/*
 *.pickle
+static/*.jpg
+staticfiles/*.jpg
+staticfiles/admin/*

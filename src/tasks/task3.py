@@ -22,6 +22,12 @@ class Task3(CreateView):
         context.update({'task3_page': 'active'})
         return context
 
+def execute_task3(request):
+    print(request.__dict__)
+    print(request.method)
+    similar_objects = {}
+    return HttpResponse('You received a response'+json.dumps(similar_objects), status=200)
+    # pass
 
 def execute_task3(request):
     similar_objects = {}
@@ -36,5 +42,5 @@ def execute_task3(request):
     dominant_images = pg_obj.get_K_dominant_images(5, 13, ["Hand_0008333.jpg", "Hand_0006183.jpg", "Hand_0000074.jpg"],
                                                    "/Labelled/Set2")
     # return HttpResponse('You received a response'+json.dumps(similar_objects), status=200)
-    return render(request, 'visualize_images.html', {'images': dominant_images})
+    return render(request, 'visualize_images.html', {'images': dominant_images, "from_task": "task3"})
     # pass
