@@ -36,6 +36,28 @@ class DataPreProcessor:
         for i in range(len(processes)):
             processes[i].join()
 
+        # classification specific
+
+        charas = ["Labelled", "Unlabelled"]
+        sets = ["Set1", "Set2"]
+
+        for chara_ in charas:
+            for set_ in sets:
+                path = self.CLASSIFICATION_IMAGES_PATH + "/" + chara_ + + "/" + set_
+
+                feature_models = []
+
+                feature_models.append("histogram_of_gradients" + "_" + chara_ + "_" + set_)
+
+                processes = []
+                for i, feature in enumerate(feature_models):
+                    processes.append(Process(target=self.perform_classification_feature_model(feature, path)))
+                    processes[i].start()
+
+                for i in range(len(processes)):
+                    processes[i].join()
+
+
     # This function will read all the metadata of input images and put those metadata details in database.
     def process_metadata(self):
         csv_file_path = os.getcwd()[:-7] + 'Data/HandInfo.csv'
@@ -106,9 +128,12 @@ class DataPreProcessor:
         self.database_connection.create_feature_model_table(feature)
         self.database_connection.insert_feature_data(feature, feature_vectors)
 
-    def perform_feature_model_for_classification(self, feature):
-        # writing this
-        pass
+    def perform_classification_feature_model(self, feature, path):
+        histogram_of_gradients = HistogramOfGradients()
+        feature_vectors = histogram_of_gradients.get_image_vectors(path)
+
+        self.database_connection.create_feature_model_table(feature)
+        self.database_connection.insert_feature_data(feature, feature_vectors)
 
 
 if __name__ == "__main__":
