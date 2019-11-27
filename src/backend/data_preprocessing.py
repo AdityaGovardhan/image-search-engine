@@ -94,7 +94,7 @@ class DataPreProcessor:
         cursor = connection.cursor()
 
         for metadata_file in metadata_files:
-            table_name = metadata_file.split('.')[0]
+            table_name = "metadata_" + metadata_file.split('.')[0]
             metadata_file_path = data_folder + "/" + metadata_file
 
             cursor.execute("DROP Table IF EXISTS " + table_name + ";")

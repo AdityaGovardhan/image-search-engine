@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.views.generic import CreateView
+from django.http import HttpResponse
 from src import models
+import json
 
 
 class Task4(CreateView):
@@ -15,5 +17,10 @@ class Task4(CreateView):
 
 
 
-def execute_task4():
-    pass
+def execute_task4(request):
+    # pass
+    print(request.__dict__)
+    print(request.method)
+    similar_objects = {}
+
+    return HttpResponse('You received a response'+json.dumps(similar_objects), status=200)
