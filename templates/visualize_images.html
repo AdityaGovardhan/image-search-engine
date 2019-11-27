@@ -31,7 +31,7 @@
                     <img src="{% static image.0 %}" height="200" width="200"/>
                     <p>Image: {{ image.0 }}</p>
                     <p>Score: {{ image.1 }}</p>
-                    {% if from_task == "task6" %}
+                    {% if from_task == "task6" or from_task == "task5"%}
                         <label class="btn btn-success active">
                             <input class="radio_button" type="radio" tag="relevant" name="{{ image.0 }}" id="relevant_{{ image.0 }}" autocomplete="off" unchecked> Relevant
                         </label>
@@ -43,7 +43,7 @@
             {% endfor %}
 
             </div>
-            {% if from_task == "task6" %}
+            {% if from_task == "task6" or from_task == "task5" %}
                 <button id="submit_feedback_button" type="submit" class="btn btn-primary" csrf_token="{{ csrf_token }}" >Submit Feedback</button>
             {% endif %}
         </div>

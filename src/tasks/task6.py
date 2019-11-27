@@ -16,13 +16,12 @@ class Task6(CreateView):
         context = super(Task6, self).get_context_data(**kwargs)
         context.update({'task6_page': 'active'})
         return context
-    # pass
 
 
 def execute_task6(request):
     rf = RelevanceFeedback()
-    m = 5
-    q_name = 'Hand_0008129.jpg'
+    m = int(request.POST.get('most_similar_images'))
+    q_name = query_image=request.POST.get('query_image')
     q = rf.database_connection.get_feature_data_for_image('histogram_of_gradients', q_name)
     obj_feature_matrix = rf.database_connection.get_object_feature_matrix_from_db('histogram_of_gradients')
     data_matrix = obj_feature_matrix['data_matrix']
