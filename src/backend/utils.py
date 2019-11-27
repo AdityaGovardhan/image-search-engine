@@ -6,11 +6,11 @@ from scipy import spatial
 import matplotlib.pyplot as plt
 import matplotlib
 
-from database_connection import DatabaseConnection
+from backend.database_connection import DatabaseConnection
 import os
 from pathlib import Path
 import pickle
-from singular_value_decomposition import SingularValueDecomposition
+from backend.singular_value_decomposition import SingularValueDecomposition
 
 
 ALPHA = 0.85
