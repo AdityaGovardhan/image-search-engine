@@ -31,10 +31,11 @@ def get_euclidian_distance(vector1, vector2):
     return np.linalg.norm(vector1 - vector2)
 
 def get_image_directory(content_type='database_images'):
+    data_dir = get_data_directory()
     if content_type == 'database_images':
-        return str(Path(os.getcwd()).parent) + '/Data/images'
+        return str(Path(data_dir + '/images'))
     elif content_type == 'classification_images':
-        return str(Path(os.getcwd()).parent) + '/Data/phase3_sample_data'
+        return str(Path(data_dir + '/phase3_sample_data'))
 
 def read_from_database(model,label=None):
     database_connection = DatabaseConnection()

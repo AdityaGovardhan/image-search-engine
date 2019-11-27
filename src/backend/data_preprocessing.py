@@ -2,7 +2,6 @@ from database_connection import DatabaseConnection
 import os
 from histogram_of_gradients import HistogramOfGradients
 from multiprocessing import Process
-from utils import get_image_directory
 import os
 from pathlib import Path
 
@@ -21,8 +20,8 @@ class DataPreProcessor:
         self.process_metadata()
         self.process_classification_metadata()
 
-        self.DATABASE_IMAGES_PATH = get_image_directory('database_images')
-        self.CLASSIFICATION_IMAGES_PATH = get_image_directory('classification_images')
+        self.DATABASE_IMAGES_PATH = str(Path(str(Path(os.getcwd()).parent) + "/Data/images"))
+        self.CLASSIFICATION_IMAGES_PATH = str(Path(str(Path(os.getcwd()).parent) + "/Data/phase3_sample_data"))
 
         feature_models = []
 
@@ -43,7 +42,7 @@ class DataPreProcessor:
 
         for chara_ in charas:
             for set_ in sets:
-                path = self.CLASSIFICATION_IMAGES_PATH + "/" + chara_ + + "/" + set_
+                path = self.CLASSIFICATION_IMAGES_PATH + "/" + chara_ + "/" + set_
 
                 feature_models = []
 
@@ -60,7 +59,7 @@ class DataPreProcessor:
 
     # This function will read all the metadata of input images and put those metadata details in database.
     def process_metadata(self):
-        csv_file_path = os.getcwd()[:-7] + 'Data/HandInfo.csv'
+        csv_file_path = str(Path(str(Path(os.getcwd()).parent) + "/Data/HandInfo.csv"))
         connection = self.database_connection.get_db_connection()
         cursor = connection.cursor()
         cursor.execute("""DROP Table IF EXISTS metadata;""")
@@ -88,7 +87,7 @@ class DataPreProcessor:
 
         metadata_files = ['labelled_set1.csv', 'labelled_set2.csv', 'unlabelled_set1.csv', 'unlabelled_set2.csv']
 
-        data_folder = os.getcwd()[:-7] + 'Data/phase3_sample_data/'
+        data_folder = str(Path(str(Path(os.getcwd()).parent) + "/Data/phase3_sample_data"))
 
         connection = self.database_connection.get_db_connection()
 
@@ -96,8 +95,8 @@ class DataPreProcessor:
 
         for metadata_file in metadata_files:
             table_name = metadata_file.split('.')[0]
-            metadata_file_path = data_folder + metadata_file
-            
+            metadata_file_path = data_folder + "/" + metadata_file
+
             cursor.execute("DROP Table IF EXISTS " + table_name + ";")
 
             cursor.execute("""CREATE TABLE IF NOT EXISTS """ + table_name + """(
@@ -122,15 +121,15 @@ class DataPreProcessor:
             connection.commit()
 
     def perform_feature_model(self, feature):
-        histogram_of_gradients = HistogramOfGradients()
-        feature_vectors = histogram_of_gradients.get_image_vectors(self.DATABASE_IMAGES_PATH)
+        histogram_of_gradients = HistogramOfGradients(self.DATABASE_IMAGES_PATH)
+        feature_vectors = histogram_of_gradients.get_image_vectors()
 
         self.database_connection.create_feature_model_table(feature)
         self.database_connection.insert_feature_data(feature, feature_vectors)
 
     def perform_classification_feature_model(self, feature, path):
-        histogram_of_gradients = HistogramOfGradients()
-        feature_vectors = histogram_of_gradients.get_image_vectors(path)
+        histogram_of_gradients = HistogramOfGradients(path)
+        feature_vectors = histogram_of_gradients.get_image_vectors()
 
         self.database_connection.create_feature_model_table(feature)
         self.database_connection.insert_feature_data(feature, feature_vectors)
