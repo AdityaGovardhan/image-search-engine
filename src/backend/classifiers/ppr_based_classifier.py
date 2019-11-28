@@ -1,5 +1,6 @@
 
-from utils import convert_folder_path_to_table_name, get_filtered_images_by_label, convert_tuple_to_dict
+from utils import convert_folder_path_to_table_name, get_filtered_images_by_label, \
+    convert_tuple_to_dict, calculate_classification_accuracy
 from database_connection import DatabaseConnection
 import numpy as np
 from pageRank import PageRank
@@ -48,7 +49,7 @@ class PPRClassifier:
 
         correct_labels = db_conn.get_correct_labels_for_given_images(image_names=unlabeled_image_names, label_type="aspectOfHand")
 
-        acc = self.calculate_classification_accuracy(convert_tuple_to_dict(images_with_labels), convert_tuple_to_dict(correct_labels))
+        acc = calculate_classification_accuracy(convert_tuple_to_dict(images_with_labels), convert_tuple_to_dict(correct_labels))
 
         print("********************************************")
         print("Accuracy = ", acc)

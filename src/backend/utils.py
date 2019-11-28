@@ -214,6 +214,5 @@ def calculate_classification_accuracy(pred_labels, correct_labels):
     for key in keys:
         if(pred_labels[key] in correct_labels[key]):
             cnt += 1
-            print(correct_labels[key])
     print(cnt)
     return (cnt/len(pred_labels))*100

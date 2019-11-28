@@ -81,6 +81,15 @@ class PageRank:
 
 
     def get_K_dominant_images(self, k, K, imageIDs, relative_folder_path):
+        """
+
+        :param k: number of outgoing edges in the topology
+        :param K: Number of dominant images required
+        :param imageIDs: list of images that user likes or is interested in
+        e.g. ['Hand_0009002.jpg', 'Hand_0008128.jpg', 'Hand_0008662.jpg']
+        :param relative_folder_path: Here
+        :return:
+        """
         svd_image_data, image_names = get_svd_image_data_from_folder(relative_folder_path)
         S = self.get_seed_vector(imageIDs, image_names)
         location = relative_folder_path
