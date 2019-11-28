@@ -37,7 +37,7 @@ def execute_task3(request):
     #Query 1 use the images from Labelled/Set2
     # dominant_images = pg_obj.get_K_dominant_images(5, 10, ["Hand_0008333.jpg", "Hand_0006183.jpg", "Hand_0000074.jpg"])
     # dominant_images = pg_obj.get_K_dominant_images(5, 20, ['Hand_0009002.jpg', 'Hand_0008128.jpg', 'Hand_0008662.jpg'], "/Labelled/Set2")
-    # dominant_images = pg_obj.get_K_dominant_images(5, 10, ['Hand_0009446.jpg'], "/Labelled/Set2")
+    # dominant_images = pg_obj.get_K_dominant_images(5, 10, ['Hand_0008333.jpg'], "/Labelled/Set2")
     # dominant_images = pg_obj.get_K_dominant_images(32, 20, ['Hand_0011362.jpg', 'Hand_0008662.jpg', 'Hand_0011505.jpg'],
     #                                                "/Labelled/Set2")
     #Output of Sample Query 1 Task 3

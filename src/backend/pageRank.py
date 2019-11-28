@@ -14,21 +14,26 @@ class PageRank:
     def __init__(self):
         self.db_conn = DatabaseConnection()
 
-    def get_image_similarity_matrix(self, k, svd_image_data):
+    def get_image_similarity_matrix_within_all_images(self, svd_image_data):
         image_distance_matrix = np.array([])
         for each_row in svd_image_data:
             sub_matrix = np.subtract(svd_image_data, each_row)
-            euc_dist = np.linalg.norm(sub_matrix, axis = 1, keepdims=True)
-            if(image_distance_matrix.size == 0):
+            euc_dist = np.linalg.norm(sub_matrix, axis=1, keepdims=True)
+            if (image_distance_matrix.size == 0):
                 image_distance_matrix = euc_dist
             else:
-                image_distance_matrix = np.concatenate((image_distance_matrix, euc_dist), axis = 1)
+                image_distance_matrix = np.concatenate((image_distance_matrix, euc_dist), axis=1)
 
         image_distance_matrix[image_distance_matrix == 0] = 1
-
-        n = image_distance_matrix.shape[1]
         image_similarity_matrix = np.reciprocal(image_distance_matrix)
 
+        return image_similarity_matrix
+
+
+    def get_image_similarity_matrix_for_top_k_images(self, k, svd_image_data):
+
+        image_similarity_matrix = self.get_image_similarity_matrix_within_all_images(svd_image_data)
+        n = image_similarity_matrix.shape[1]
         threshold_col = np.partition(image_similarity_matrix, n-k-1, axis = 1)[:, n-k-1]
         threshold_col = threshold_col.reshape(threshold_col.shape[0], 1)
         image_similarity_matrix[image_similarity_matrix < threshold_col] = 0
@@ -79,7 +84,7 @@ class PageRank:
         svd_image_data, image_names = get_svd_image_data_from_folder(relative_folder_path)
         S = self.get_seed_vector(imageIDs, image_names)
         location = relative_folder_path
-        image_similarity_matrix = self.get_image_similarity_matrix(k, svd_image_data)
+        image_similarity_matrix = self.get_image_similarity_matrix_for_top_k_images(k, svd_image_data)
         pickle_file_name = "page_rank_interim_task3"+location.replace("/","_")+".pickle"
         pie = self.get_page_rank_eigen_vector(image_similarity_matrix, S, pickle_file_name=pickle_file_name)
         # print("**************PIE******************")

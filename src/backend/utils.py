@@ -162,7 +162,7 @@ def get_image_names_in_a_folder(relative_folder_path):
     image_names = [os.path.basename(x) for x in files]
     return image_names
 
-def get_svd_image_data_from_folder(relative_folder_path, k=8):
+def get_svd_image_data_from_folder(relative_folder_path, k=10):
     """
     :param relative_folder_path: here give the path with a '/' ahead e.g. '/Labelled/Set2'
     :return:
@@ -175,3 +175,45 @@ def get_svd_image_data_from_folder(relative_folder_path, k=8):
     svd_obj = SingularValueDecomposition()
     svd_image_data = svd_obj.get_transformed_data(data_matrix, k)
     return svd_image_data, data_image_dict['images']
+
+
+def convert_folder_path_to_table_name(folder_name, pre_string = "metadata"):
+    """
+
+    :param folder_name: e.g. /Labelled/Set2
+    :param pre_string: pass the string to prepend before the folder name
+    :return:
+    """
+
+    folder_name = folder_name.replace(" ", "")
+    folder_name = folder_name.replace("/", "_")
+    folder_name = folder_name.lower()
+
+    if(folder_name[0] == '_'):
+        table_name = pre_string + folder_name
+    else:
+        table_name = pre_string + "_" + folder_name
+    return table_name
+
+
+def get_filtered_images_by_label(labelled_images, filter_by):
+    return [x[0] for x in labelled_images if filter_by in x[1]]
+
+
+def convert_tuple_to_dict(tuple):
+    dict = {}
+    for each in tuple:
+        dict[each[0]] = each[1]
+
+    return dict
+
+def calculate_classification_accuracy(pred_labels, correct_labels):
+    cnt = 0
+    keys = pred_labels.keys()
+
+    for key in keys:
+        if(pred_labels[key] in correct_labels[key]):
+            cnt += 1
+            print(correct_labels[key])
+    print(cnt)
+    return (cnt/len(pred_labels))*100
