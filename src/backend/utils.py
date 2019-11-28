@@ -177,25 +177,6 @@ def get_svd_image_data_from_folder(relative_folder_path, k=10):
     return svd_image_data, data_image_dict['images']
 
 
-def convert_folder_path_to_table_name(folder_name, pre_string = "metadata"):
-    """
-
-    :param folder_name: e.g. /Labelled/Set2
-    :param pre_string: pass the string to prepend before the folder name
-    :return:
-    """
-
-    folder_name = folder_name.replace(" ", "")
-    folder_name = folder_name.replace("/", "_")
-    folder_name = folder_name.lower()
-
-    if(folder_name[0] == '_'):
-        table_name = pre_string + folder_name
-    else:
-        table_name = pre_string + "_" + folder_name
-    return table_name
-
-
 def get_filtered_images_by_label(labelled_images, filter_by):
     return [x[0] for x in labelled_images if filter_by in x[1]]
 

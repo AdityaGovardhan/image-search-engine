@@ -34,7 +34,8 @@ class Task3Model(models.Model):
 
 class Task4Model(models.Model):
     classifier = models.CharField(max_length=6, choices=classifiers, default='Support Vector Machine')
-
+    labelled_folder_name = models.CharField(max_length=100, verbose_name="Labelled Folder Path")
+    unlabelled_folder_name = models.CharField(max_length=100, verbose_name="Unlabelled Folder Path")
 
 class Task5Model(models.Model):
     number_of_layers = models.CharField(max_length=2)
