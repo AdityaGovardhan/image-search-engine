@@ -79,7 +79,7 @@ class LSH:
         return list_similar_images
 
     # Tries to find k similar images 
-    def find_ksimilar_images(self,k,image_vector):
+    def find_ksimilar_images(self,k,image_vector,all_image_hog_features):
         similar_images = self.process_query_image(image_vector)
         while(k > len(similar_images) and self.num_of_reduced_times < self.num_hash_functions - 1):
             similar_images.extend(self.get_images_by_reducing_representation())
@@ -88,7 +88,8 @@ class LSH:
         
         # need to implement euclidean distance comparision
         # not neccessarily should happen here
-        return similar_images
+        return self.get_sorted_k_values(num_similar_images=k,similar_images=similar_images,all_image_hog_features=all_image_hog_features,
+                                        image_vector=image_vector)
             
     # Finds similar images by reducing representation 
     def get_images_by_reducing_representation(self):
@@ -138,9 +139,8 @@ if __name__=="__main__":
     image_vector = dbconnection.get_feature_data_for_image('histogram_of_gradients','Hand_0000012.jpg')
     image_vector = np.asarray(image_vector.flatten())
     num_similar_images = 6
-    similar_images = lsh.find_ksimilar_images(k=num_similar_images,image_vector=image_vector)
-    print(lsh.get_sorted_k_values(num_similar_images=num_similar_images,similar_images=similar_images,all_image_hog_features=all_image_hog_features,
-            image_vector=image_vector))
+    print(lsh.find_ksimilar_images(k=num_similar_images,image_vector=image_vector,all_image_hog_features=all_image_hog_features))
+    
 
 
   

@@ -30,13 +30,10 @@ def execute_task5(request):
     image_vector = dbconnection.get_feature_data_for_image('histogram_of_gradients',query_image)
     image_vector = np.asarray(image_vector.flatten())
     
-    similar_images = lsh.find_ksimilar_images(t,image_vector)
-    sorted_k_values= lsh.get_sorted_k_values(num_similar_images=t,similar_images=similar_images,all_image_hog_features=all_image_hog_features,
-                                                image_vector=image_vector)
-    
+    sorted_k_values = lsh.find_ksimilar_images(k=t,image_vector=image_vector,all_image_hog_features=all_image_hog_features)
+        
     #Now getting a bigger test dataset for relevance feedback
-    test_dataset= lsh.get_sorted_k_values(num_similar_images=30,similar_images=lsh.find_ksimilar_images(30,image_vector),
-                                        all_image_hog_features=all_image_hog_features,image_vector=image_vector)
+    test_dataset= lsh.find_ksimilar_images(k=30,image_vector=image_vector,all_image_hog_features=all_image_hog_features)
 
     save_to_pickle(test_dataset,'test_dataset.pickle')
 
