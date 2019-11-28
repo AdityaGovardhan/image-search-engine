@@ -22,15 +22,13 @@ class Task1(CreateView):
 
 
 def execute_task1(request):
-    print(request.__dict__)
-    print(request.method)
+    # print(request.__dict__)
+    # print(request.method)
     similar_objects = {}
 
-    pca_classifier_obj = Task1_Classifier()
-    labelled_path = "/phase2_200/"
-    unlabelled_folder_path = "/Output/"
-    prediction = pca_classifier_obj.get_label_for_folder(labelled_path, unlabelled_folder_path, 20)
-    prediction = sorted(prediction, key=lambda k: k[0])
-    pprint.pprint(prediction)
+    task1_classifier_obj = Task1_Classifier()
+    labelled_path = "/Labelled/Set1"
+    unlabelled_folder_path = "/Unlabelled/Set1"
+    prediction = task1_classifier_obj.get_label_for_folder(labelled_path, unlabelled_folder_path, 10)
 
-    return HttpResponse('You received a response' + json.dumps(similar_objects), status=200)
+    return render(request, 'visualize_images.html', {'images': prediction, "from_task": "task1"})

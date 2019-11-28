@@ -41,6 +41,7 @@ def read_from_database(model,label=None):
         img_data_matrix_dict=database_connection.get_object_feature_matrix_from_db(tablename=model)
         return img_data_matrix_dict
 
+
 def get_dot_distance(vector1, vector2):
     return np.dot(vector1, vector2)
 
@@ -66,6 +67,23 @@ def plot_scree_test(eigen_values):
                      markerscale=0.4)
     leg.get_frame().set_alpha(0.4)
     plt.show()
+
+def convert_folder_path_to_table_name(folder_name, pre_string = "metadata"):
+    """
+     :param folder_name: e.g. /Labelled/Set2
+    :param pre_string: pass the string to prepend before the folder name
+    :return:
+    """
+
+    folder_name = folder_name.replace(" ", "")
+    folder_name = folder_name.replace("/", "_")
+    folder_name = folder_name.lower()
+
+    if(folder_name[0] == '_'):
+        table_name = pre_string + folder_name
+    else:
+        table_name = pre_string + "_" + folder_name
+    return table_name
 
 def get_most_m_similar_images(data_with_images, query_image_feature_vector, Vt, m):
     """
@@ -138,7 +156,7 @@ def get_image_names_in_a_folder(relative_folder_path):
     list of image names
     """
 
-    data_dir = get_data_directory()
+    data_dir = get_image_directory("classification_images")
     path = str(Path(data_dir + relative_folder_path)) + '/*.jpg'
     files = glob.glob(path)
     image_names = [os.path.basename(x) for x in files]
