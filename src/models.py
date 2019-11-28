@@ -27,7 +27,10 @@ class Task2Model(models.Model):
 
 class Task3Model(models.Model):
     most_similar_images = models.CharField(max_length=2, verbose_name = "Number of Most Similar Images")
-
+    k = models.CharField(max_length=3, verbose_name="Number of outgoing Edges(k)")
+    K = models.CharField(max_length=3, verbose_name="Number of most Dominant Images(K)")
+    folder_name = models.CharField(max_length=100, verbose_name="Folder Path")
+    user_images = models.CharField(max_length=200, verbose_name="User Preferred Images(Personalized)")
 
 class Task4Model(models.Model):
     classifier = models.CharField(max_length=6, choices=classifiers, default='Support Vector Machine')

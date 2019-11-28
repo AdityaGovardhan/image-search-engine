@@ -155,8 +155,6 @@ def get_svd_image_data_from_folder(relative_folder_path, k=8):
     db_conn = DatabaseConnection()
     data_image_dict = db_conn.HOG_descriptor_from_image_ids(image_names)
     data_matrix = data_image_dict['data_matrix']
-    print(image_names)
-    print(data_image_dict['images'])
     svd_obj = SingularValueDecomposition()
     svd_image_data = svd_obj.get_transformed_data(data_matrix, k)
     return svd_image_data, data_image_dict['images']

@@ -85,7 +85,6 @@ class PageRank:
         # print("**************PIE******************")
         # pprint(pie)
         image_ids = image_names.copy()
-        pprint(image_ids)
         dominant_images = self.get_top_K_images_based_on_scores(pie, image_ids, K)
 
         return dominant_images
