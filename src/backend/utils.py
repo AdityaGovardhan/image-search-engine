@@ -27,9 +27,6 @@ def get_data_directory():
     path = str(Path(os.getcwd() + '/src/Data'))
     return path
 
-def get_euclidian_distance(vector1, vector2):
-    return np.linalg.norm(vector1 - vector2)
-
 def get_image_directory(content_type='database_images'):
     data_dir = get_data_directory()
     if content_type == 'database_images':
