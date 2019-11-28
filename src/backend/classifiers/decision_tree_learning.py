@@ -5,86 +5,33 @@ from database_connection import DatabaseConnection
 from singular_value_decomposition import SingularValueDecomposition
 
 from numpy.linalg import svd
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import plot_tree
+import pprint
 
 class DecisionTreeLearning:
-    def __init__(self, C=1, kernel='linear', power=3, gamma=None):
-        self.C = C
-        self.kernel_name = kernel
-        self.power = power
-        self.gamma = gamma
-        self.number_of_samples = None
-        self.alphas = None
-        self.b = None
-        self.X = None
-        self.y = None
+    def __init__(self):
+        pass
 
     def fit(self, X, y):
-        self.X = X
-        self.y = y
-        self.number_of_samples, number_of_features = np.shape(X)
-
-        # Set gamma to 1/n_features by default and this is required only in RBF kernel
-        if not self.gamma:
-            self.gamma = 1 / number_of_features
-
-        # Calculation of P
-        P = np.zeros((self.number_of_samples, self.number_of_samples))
-        for i in range(self.number_of_samples):
-            for j in range(self.number_of_samples):
-                P[i][j] = y[i] * y[j] * self.kernels(self.kernel_name, X[i], X[j])
-        # Converting numpy into convex optimization matrix
-        P = matrix(P)
-        q = matrix(np.ones(self.number_of_samples) * -1)
-        A = matrix(y, (1, self.number_of_samples), tc='d')
-        b = matrix(0, tc='d')
-
-        if not self.C:
-            G = matrix(np.identity(self.number_of_samples) * -1)
-            h = matrix(np.zeros(self.number_of_samples))
-        else:
-            G_max = np.identity(self.number_of_samples) * -1
-            G_min = np.identity(self.number_of_samples)
-            G = matrix(np.vstack((G_max, G_min)))
-            h_max = matrix(np.zeros(self.number_of_samples))
-            h_min = matrix(np.ones(self.number_of_samples) * self.C)
-            h = matrix(np.vstack((h_max, h_min)))
-
-        # Solve the quadratic optimization problem using cvxopt
-        solution = solvers.qp(P, q, G, h, A, b)
-
-        # Lagrange multipliers
-        self.alphas = np.array(solution['x']).reshape(self.number_of_samples)
-        # Extract support vector indices
-        support_vectors = np.where(self.alphas > 1e-4)[0][0]
-        self.b = y[support_vectors] - sum(self.alphas * y * self.kernels(self.kernel_name, X, X[support_vectors]))
+        pass
 
     def predict(self, u):
-        y_pred = []
-        for sample in u:
-            if self.b + sum(self.alphas * self.y * self.kernels(self.kernel_name, self.X, sample)) >= 0:
-                y_pred.append(1)
-            else:
-                y_pred.append(0)
-        print(y_pred)
-        return np.array(y_pred)
-
-    def kernels(self, name, x, y, gamma=0):
-        if name == 'linear':
-            return np.dot(x, y.T)
-        if name == 'poly':
-            return (1 + np.dot(x, y.T)) ** 3
-        if name == 'rbf':
-            distance = np.linalg.norm(x - y) ** 2
-            return np.exp(-gamma * distance)
+        pass
 
 # testing
 if __name__ == "__main__":
 
-    k = 10
+    k = 15
+
     train_table = 'histogram_of_gradients_labelled_set1'
     train_table_metadata = 'metadata_labelled_set1'
+
     test_table = 'histogram_of_gradients_unlabelled_set1'
     test_table_metadata = 'metadata_unlabelled_set1'
+
+    label_map = {"dorsal": 0, "palmar": 1}
 
     db = DatabaseConnection()
     train_dataset = db.get_object_feature_matrix_from_db(train_table)
@@ -97,10 +44,45 @@ if __name__ == "__main__":
     tf_train_data = svd.fit_transform(train_data)
     tf_test_data = svd.transform(test_data)
 
-    print(tf_train_data.shape)
-    print(tf_test_data.shape)
+    train_labels_map = dict(db.get_correct_labels_for_given_images(train_dataset['images'], 'aspectOfHand', train_table_metadata))
 
-    train_labels = []
+    col_names = ['imagename', 'hog_svd_descriptor', 'label']
+    train_df = pd.DataFrame(columns=col_names)
 
-    train_label_map = db.get_correct_labels_for_given_images(train_dataset['images'], 'aspectOfHand', train_table_metadata)
-    print(train_label_map)
+    for i, image in enumerate(train_dataset['images']):
+        temp = train_labels_map[image]
+        label = temp.split(' ')[0]
+
+        train_df.loc[len(train_df)] = [image, tf_train_data[i], label_map[label]]
+
+    print(train_df)
+    print("======================================================================")
+
+    X_train, y_train = tf_train_data, train_df['label'].to_numpy(dtype=int)
+
+    model = DecisionTreeClassifier(random_state=0, min_samples_leaf=10)
+    model.fit(X_train, y_train)
+    pprint.pprint(plot_tree(model))
+
+
+    test_df = pd.DataFrame(columns=col_names)
+
+    for i, image in enumerate(test_dataset['images']):
+        label = model.predict(tf_test_data[i].reshape(1, -1))
+
+        test_df.loc[len(test_df)] = [image, tf_test_data[i], label]
+
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+        print(test_df.sort_values('imagename'))
+
+    print("======================================================================")
+
+    train_df_2 = pd.DataFrame(columns=col_names)
+
+    for i, image in enumerate(train_dataset['images']):
+        label = model.predict(tf_train_data[i].reshape(1, -1))
+
+        train_df_2.loc[len(train_df_2)] = [image, tf_train_data[i], label]
+
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+        print(train_df_2.sort_values('imagename'))
