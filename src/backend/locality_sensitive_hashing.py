@@ -113,30 +113,34 @@ class LSH:
                     list_similar_images.extend(value)
         return list_similar_images
 
-    
+    def get_sorted_k_values(self,num_similar_images,similar_images,all_image_hog_features,image_vector):
+        similar_images_vectors = []
+        if(num_similar_images <= len(similar_images)):
+            for i in similar_images:
+                index = all_image_hog_features['images'].index(i)
+                similar_images_vectors.append(all_image_hog_features['data_matrix'][index])
+            ranking ={}
+            for i_comp_vector in range(len(similar_images_vectors)):
+                image_name = similar_images[i_comp_vector]
+                comp_vector_np = similar_images_vectors[i_comp_vector]
+                # print(i_comp_vector," : ",np.linalg.norm(input_vector - comp_vector_np))
+                ranking[image_name] =np.linalg.norm(image_vector - comp_vector_np)
+            sorted_k_values = sorted(ranking.items(), key=lambda kv: kv[1])
+            # print(sorted_k_values[:num_similar_images])
+        
+        return sorted_k_values[:num_similar_images]
 
 if __name__=="__main__":
     lsh = LSH(k=9,l=10)
     dbconnection = DatabaseConnection()
     all_image_hog_features = dbconnection.get_object_feature_matrix_from_db(tablename='histogram_of_gradients')
     bit_map = lsh.generate_representation_for_all_layers(all_image_hog_features['data_matrix'],all_image_hog_features['images'])
-    image_vector = dbconnection.get_feature_data_for_image('histogram_of_gradients','Hand_0000002.jpg')
+    image_vector = dbconnection.get_feature_data_for_image('histogram_of_gradients','Hand_0000012.jpg')
     image_vector = np.asarray(image_vector.flatten())
     num_similar_images = 6
-    similar_images = lsh.find_ksimilar_images(num_similar_images,image_vector)
-    similar_images_vectors = []
-    if(num_similar_images <= len(similar_images)):
-        for i in similar_images:
-            index = all_image_hog_features['images'].index(i)
-            similar_images_vectors.append(all_image_hog_features['data_matrix'][index])
-        ranking ={}
-        for i_comp_vector in range(len(similar_images_vectors)):
-            image_name = similar_images[i_comp_vector]
-            comp_vector_np = similar_images_vectors[i_comp_vector]
-            # print(i_comp_vector," : ",np.linalg.norm(input_vector - comp_vector_np))
-            ranking[image_name] =np.linalg.norm(image_vector - comp_vector_np)
-        sorted_k_values = sorted(ranking.items(), key=lambda kv: kv[1])
-        print(sorted_k_values[:num_similar_images])
+    similar_images = lsh.find_ksimilar_images(k=num_similar_images,image_vector=image_vector)
+    print(lsh.get_sorted_k_values(num_similar_images=num_similar_images,similar_images=similar_images,all_image_hog_features=all_image_hog_features,
+            image_vector=image_vector))
 
 
   

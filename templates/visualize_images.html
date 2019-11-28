@@ -44,7 +44,7 @@
 
             </div>
             {% if from_task == "task6" or from_task == "task5" and rel_type != "None" %}
-                <button id="submit_feedback_button"  type="submit" q="{{q}}" class="btn btn-primary" rel_type="{{ rel_type }}" csrf_token="{{ csrf_token }}" >Submit Feedback</button>
+                <button id="submit_feedback_button"  type="submit" q="{{q}}" t="{{t}}" class="btn btn-primary" rel_type="{{ rel_type }}" csrf_token="{{ csrf_token }}" >Submit Feedback</button>
             {% endif %}
         </div>
     {% endblock result%}

@@ -33,10 +33,12 @@ $( document ).ready(function() {
 
         var name = $(this).attr('rel_type');
         var q = $(this).attr('q');
+        var t = parseInt($(this).attr('t'));
         formData.append('relevant[]', JSON.stringify(relevant));
         formData.append('irrelevant[]', JSON.stringify(irrelevant));        
         formData.append('rel_type',JSON.stringify(name));
         formData.append('q',JSON.stringify(q))
+        formData.append('t',JSON.stringify(t))
         
         $.ajax({
             type: 'POST',
