@@ -45,7 +45,7 @@ class Task1_Classifier:
     def get_label_for_folder(self, relative_input_folder_path, relative_output_folder_path, no_of_components=20):
         image_names = get_image_names_in_a_folder(relative_input_folder_path)
         #print(image_names)
-        labelled_images = self.db_conn.get_correct_labels_for_given_images(image_names, "aspect")
+        labelled_images = self.db_conn.get_correct_labels_for_given_images(image_names, "aspectofhand")
         # print(labelled_images)
 
         dorsal_images = []
