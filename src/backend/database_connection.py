@@ -47,7 +47,7 @@ class DatabaseConnection:
         result_row = cursor.fetchone()
         return np.array(pickle.loads(result_row[0]))
 
-    def get_object_feature_matrix_from_db(self, tablename, label=None, label_type=None):
+    def get_object_feature_matrix_from_db(self, tablename, label=None, label_type=None, metadata_table="metadata"):
         """
         Returns the object feature(Data) matrix for dimensionality reduction for a model
         Output Shape: [# of images in db, feature length]
@@ -56,18 +56,18 @@ class DatabaseConnection:
         cursor = connection.cursor()
         if not label_type:
             query = "SELECT * from {0}".format(tablename)
-        elif label_type == "aspect":
-            query = "SELECT * FROM {0} WHERE imagename IN  (SELECT imagename FROM metadata WHERE aspectofhand " \
-                    "LIKE '%{1}%')".format(tablename, label)
+        elif label_type == "aspectofhand":
+            query = "SELECT * FROM {0} WHERE imagename IN  (SELECT imagename FROM {2} WHERE aspectofhand " \
+                    "LIKE '%{1}%')".format(tablename, label, metadata_table)
         elif label_type == "gender":
-            query = "SELECT * FROM {0} WHERE imagename IN  (SELECT imagename FROM metadata WHERE gender = '{1}')".\
-                format(tablename, label)
+            query = "SELECT * FROM {0} WHERE imagename IN  (SELECT imagename FROM {2} WHERE gender = '{1}')".\
+                format(tablename, label, metadata_table)
         elif label_type == "accessories":
-            query = "SELECT * FROM {0} WHERE imagename IN  (SELECT imagename FROM metadata WHERE accessories = '{1}')".\
-                format(tablename, label)
+            query = "SELECT * FROM {0} WHERE imagename IN  (SELECT imagename FROM {2} WHERE accessories = '{1}')".\
+                format(tablename, label, metadata_table)
         elif label_type == "subject":
-            query = "SELECT * FROM {0} WHERE imagename IN  (SELECT imagename FROM metadata WHERE id = '{1}')".\
-                format(tablename, label)
+            query = "SELECT * FROM {0} WHERE imagename IN  (SELECT imagename FROM {2} WHERE id = '{1}')".\
+                format(tablename, label, metadata_table)
         cursor.execute(query)
         db_output = cursor.fetchall()
         obj_feature_matrix = []
@@ -89,8 +89,12 @@ class DatabaseConnection:
         result = cursor.fetchall()
         return result
 
-    def HOG_descriptor_from_image_ids(self, image_ids):
-        tablename = "histogram_of_gradients"
+    def HOG_descriptor_from_image_ids(self, image_ids, tablename='histogram_of_gradients'):
+        """
+        To be deprecated
+        """
+
+        # tablename = "histogram_of_gradients"
         connection = self.get_db_connection()
         cursor = connection.cursor()
         query = "SELECT * FROM {0} WHERE imagename IN {1}".format(tablename, tuple(image_ids))
