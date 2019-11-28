@@ -30,9 +30,14 @@ $( document ).ready(function() {
     $(document).on("click","#submit_feedback_button",function () {
         console.log("Clicked");
         var formData = new FormData();
-        formData.append('relevant[]', JSON.stringify(relevant));
-        formData.append('irrelevant[]', JSON.stringify(irrelevant));
 
+        var name = $(this).attr('rel_type');
+        var q = $(this).attr('q');
+        formData.append('relevant[]', JSON.stringify(relevant));
+        formData.append('irrelevant[]', JSON.stringify(irrelevant));        
+        formData.append('rel_type',JSON.stringify(name));
+        formData.append('q',JSON.stringify(q))
+        
         $.ajax({
             type: 'POST',
             url: '/get_feedback',
@@ -45,7 +50,6 @@ $( document ).ready(function() {
                 $('#showResults').html(result);
                 relevant = [];
                 irrelevant = [];
-
             },
             error: function (err_msg) {
                 console.log("error ", err_msg)

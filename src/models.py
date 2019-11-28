@@ -13,6 +13,7 @@ task_6_relevance_feedbacks = (
         ('Decision Tree Classifier', 'Decision Tree Classifier'),
         ('Personalized Page Rank', 'Personalized Page Rank'),
         ('Probabilistic', 'Probabilistic'),
+        ('None', 'None'),
     )
 
 
@@ -38,8 +39,7 @@ class Task5Model(models.Model):
     set_of_vectors = models.CharField(max_length=2)
     query_image = models.CharField(max_length=100)
     most_similar_images = models.CharField(max_length=2, verbose_name = "Number of Most Similar Images")
-
-
+    relevance_feedback = models.CharField(max_length=6, choices=task_6_relevance_feedbacks, default='None')
 
 class Task6Model(models.Model):
     relevance_feedback = models.CharField(max_length=6, choices=task_6_relevance_feedbacks, default='Probabilistic')

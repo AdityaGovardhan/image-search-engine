@@ -33,8 +33,11 @@ class RelevanceFeedback:
 			vector=self.database_connection.get_feature_data_for_image('histogram_of_gradients',item)
 			avg_irl_vec=avg_irl_vec+vector
 
-		avg_rel_vec=avg_rel_vec/len(relevant_items)
-		avg_irl_vec=avg_irl_vec/len(irrel_items)		
+		if len(relevant_items)!=0: 
+			avg_rel_vec=avg_rel_vec/len(relevant_items)
+		
+		if len(irrel_items)!=0:			
+			avg_irl_vec=avg_irl_vec/len(irrel_items)		
 
 		q_new= alpha*q_old + beta*avg_rel_vec - gamma*avg_irl_vec
 		return q_new
@@ -67,15 +70,103 @@ class RelevanceFeedback:
 
 		return rel_items,irl_items
 
-	def get_SVM_based_feedback(self):
-		pass
+	def get_SVM_based_feedback(self,q,Vt,rel_items,irl_items,obj_feature_matrix):
+		q_new=self.compute_new_query_vector(q_old=q,relevant_items=rel_items,irrel_items=irl_items)
+		"""
+		After computing q_new, now we will train an SVM classifier on the basis of rel_items and irl_items
+		After training the SVM classifier we test it on a superset of data from LSH (possibly 1000+t)
+		We create an obj_feature_matrix on the basis of predicted relevant items from the classifier
+		We pass this to the get_most_m_similar_images() function
 
-	def get_Dec_Tree_based_feedback(self):
-		pass
+		Potenial Lines of code from this point onwards:
+		svm=SupportVectorMachine()
+		lsh=LSH()
+		X_train=[append getFeatureVecsfromDB(rel_items)]
+		Y_train=[append 1 for rel_items]
+		X_train=[append getFeatureVecsfromDB(irl_items)]
+		Y_train=[append 0 for irl_items]
+		svm.fit(X_train,Y_train)
+		similar_images = lsh.find_ksimilar_images(1000+t,image_vector)
+		X_test= getFeatureVecsfromDB(similar_images)
+		Y_test= svm.predict(X_test)
+		rel=[X_test[i] for i in range(0,len(Y_test)) where Y_test[i]==1]
+		obj_feature_matrix_new= create_obj_feat_matrix()
+		Now u are good to continue below
+		Same thing can be done for DTC and PPR
+		"""
+		new_rank_list=get_most_m_similar_images(data_with_images=obj_feature_matrix,query_image_feature_vector=q_new,Vt=Vt,m=5)
+		return new_rank_list
 
-	def get_PPR_based_feedback(self):
-		pass		
+	def get_DTC_based_feedback(self,q,Vt,rel_items,irl_items,obj_feature_matrix):
+		q_new=self.compute_new_query_vector(q_old=q,relevant_items=rel_items,irrel_items=irl_items)
+		"""
+		After computing q_new, now we will train an SVM classifier on the basis of rel_items and irl_items
+		After training the SVM classifier we test it on a superset of data from LSH (possibly 1000+t)
+		We create an obj_feature_matrix on the basis of predicted relevant items from the classifier
+		We pass this to the get_most_m_similar_images() function
 
+		Potenial Lines of code from this point onwards:
+		svm=SupportVectorMachine()
+		lsh=LSH()
+		X_train=[append getFeatureVecsfromDB(rel_items)]
+		Y_train=[append 1 for rel_items]
+		X_train=[append getFeatureVecsfromDB(irl_items)]
+		Y_train=[append 0 for irl_items]
+		svm.fit(X_train,Y_train)
+		similar_images = lsh.find_ksimilar_images(1000+t,image_vector)
+		X_test= getFeatureVecsfromDB(similar_images)
+		Y_test= svm.predict(X_test)
+		rel=[X_test[i] for i in range(0,len(Y_test)) where Y_test[i]==1]
+		obj_feature_matrix_new= create_obj_feat_matrix()
+		Now u are good to continue below
+		Same thing can be done for DTC and PPR
+		"""
+		new_rank_list=get_most_m_similar_images(data_with_images=obj_feature_matrix,query_image_feature_vector=q_new,Vt=Vt,m=5)
+		return new_rank_list
+
+	def get_PPR_based_feedback(self,q,Vt,rel_items,irl_items,obj_feature_matrix):
+		q_new=self.compute_new_query_vector(q_old=q,relevant_items=rel_items,irrel_items=irl_items)
+		"""
+		After computing q_new, now we will train an SVM classifier on the basis of rel_items and irl_items
+		After training the SVM classifier we test it on a superset of data from LSH (possibly 1000+t)
+		We create an obj_feature_matrix on the basis of predicted relevant items from the classifier
+		We pass this to the get_most_m_similar_images() function
+
+		Potenial Lines of code from this point onwards:
+		svm=SupportVectorMachine()
+		lsh=LSH()
+		X_train=[append getFeatureVecsfromDB(rel_items)]
+		Y_train=[append 1 for rel_items]
+		X_train=[append getFeatureVecsfromDB(irl_items)]
+		Y_train=[append 0 for irl_items]
+		svm.fit(X_train,Y_train)
+		similar_images = lsh.find_ksimilar_images(1000+t,image_vector)
+		X_test= getFeatureVecsfromDB(similar_images)
+		Y_test= svm.predict(X_test)
+		rel=[X_test[i] for i in range(0,len(Y_test)) where Y_test[i]==1]
+		obj_feature_matrix_new= create_obj_feat_matrix()
+		Now u are good to continue below
+		Same thing can be done for DTC and PPR
+		"""
+		new_rank_list=get_most_m_similar_images(data_with_images=obj_feature_matrix,query_image_feature_vector=q_new,Vt=Vt,m=5)
+		return new_rank_list	
+
+	def get_init_ranking(self,obj_feature_matrix,q): #For SVM, DTC, PPR.... check calculate_init_prob_similarity for Probab based
+		svd=singular_value_decomposition.SingularValueDecomposition()
+		data_matrix=obj_feature_matrix['data_matrix']
+		U,S,Vt=svd.get_latent_semantics(data_matrix=data_matrix,n_components=25)
+		init_rank_list=get_most_m_similar_images(data_with_images=obj_feature_matrix,query_image_feature_vector=q,Vt=Vt,m=5)
+		return init_rank_list,Vt
+		# rel_items,irl_items=rf.get_user_feedback(init_rank_list=init_rank_list,q_name=q_name)
+		# q_new=rf.compute_new_query_vector(q_old=q,relevant_items=rel_items,irrel_items=irl_items)
+		# new_rank_list=get_most_m_similar_images(data_with_images=obj_feature_matrix,query_image_feature_vector=q_new,Vt=Vt,m=5)
+
+	def get_Vt(self,obj_feature_matrix): #For SVM, DTC, PPR.... check calculate_init_prob_similarity for Probab based
+		svd=singular_value_decomposition.SingularValueDecomposition()
+		data_matrix=obj_feature_matrix['data_matrix']
+		U,S,Vt=svd.get_latent_semantics(data_matrix=data_matrix,n_components=25)
+		return Vt	
+	
 	def get_probabilistic_relevance_feedback(self,D_matrix,images,q_name,m):
 		n_i=self.calculate_n_i(D_matrix=D_matrix)
 		init_scores=self.calculate_initial_prob_similarity(D_matrix=D_matrix,images=images,n_i=n_i)
@@ -142,11 +233,14 @@ class RelevanceFeedback:
 			n_i=n_i+np.array(temp).T
 		
 		return n_i	
-
+			
 if __name__ == '__main__':
 	rf=RelevanceFeedback()
-	q_name='Hand_0008129.jpg'
+	q_name='Hand_0000012.jpg'
 	q=rf.database_connection.get_feature_data_for_image('histogram_of_gradients',q_name)
 	obj_feature_matrix=rf.database_connection.get_object_feature_matrix_from_db('histogram_of_gradients')
-	data_matrix=obj_feature_matrix['data_matrix']
-	new_rank_list=rf.get_probabilistic_relevance_feedback(D_matrix=data_matrix,images=obj_feature_matrix['images'],q_name=q_name,m=5)
+	init_ranking,Vt=rf.get_init_ranking(obj_feature_matrix=obj_feature_matrix,q=q)
+	new_rank_list=rf.get_SVM_based_feedback(init_rank_list=init_ranking,q=q,q_name=q_name,Vt=Vt)
+	# data_matrix=obj_feature_matrix['data_matrix']
+	# new_rank_list=rf.get_probabilistic_relevance_feedback(D_matrix=data_matrix,images=obj_feature_matrix['images'],q_name=q_name,m=5)
+

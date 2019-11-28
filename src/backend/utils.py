@@ -6,11 +6,11 @@ from scipy import spatial
 import matplotlib.pyplot as plt
 import matplotlib
 
-from backend.database_connection import DatabaseConnection
+from database_connection import DatabaseConnection
 import os
 from pathlib import Path
 import pickle
-from backend.singular_value_decomposition import SingularValueDecomposition
+from singular_value_decomposition import SingularValueDecomposition
 
 
 ALPHA = 0.85
@@ -51,6 +51,8 @@ def get_dot_distance(vector1, vector2):
 def get_cosine_similarity(vector1, vector2):
     return spatial.distance.cosine(vector1, vector2)
 
+def get_euclidian_distance(vector1, vector2):
+    return np.linalg.norm(vector1 - vector2)
 
 def plot_scree_test(eigen_values):
     num_vars = len(eigen_values)

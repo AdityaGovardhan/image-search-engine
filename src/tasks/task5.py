@@ -7,7 +7,7 @@ import numpy as np
 
 class Task5(CreateView):
     model = models.Task5Model
-    fields = ('number_of_layers', 'number_of_hashes_per_layer', 'set_of_vectors', 'query_image', 'most_similar_images')
+    fields = ('number_of_layers', 'number_of_hashes_per_layer', 'set_of_vectors', 'query_image', 'most_similar_images','relevance_feedback')
     template_name = 'task5.html'
 
     def get_context_data(self, **kwargs):
@@ -23,7 +23,8 @@ def execute_task5(request):
     k=int(request.POST.get('number_of_hashes_per_layer'))
     query_image=request.POST.get('query_image')
     num_similar_images = int(request.POST.get('most_similar_images'))
-
+    rel_type=request.POST.get('relevance_feedback')
+    print(rel_type)
     lsh = LSH(k=k,l=l)
     dbconnection = DatabaseConnection()
     all_image_hog_features = dbconnection.get_object_feature_matrix_from_db(tablename='histogram_of_gradients')
@@ -45,4 +46,4 @@ def execute_task5(request):
             ranking[image_name] =np.linalg.norm(image_vector - comp_vector_np)
         sorted_k_values = sorted(ranking.items(), key=lambda kv: kv[1])
 
-    return render(request, 'visualize_images.html', {'images': sorted_k_values[:num_similar_images], "from_task": "task5"})
+    return render(request, 'visualize_images.html', {'images': sorted_k_values[:num_similar_images], "from_task": "task5",'rel_type':rel_type, "q":query_image})
