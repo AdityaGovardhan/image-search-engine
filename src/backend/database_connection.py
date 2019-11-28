@@ -10,12 +10,6 @@ import pickle
 
 class DatabaseConnection:
 
-    label_type_map = {
-        "aspect":"aspectofhand",
-        "gender":"gender",
-        "accessories":"accessories"
-    }
-
     def get_db_connection(self):
         psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
         connection = psycopg2.connect(host='localhost', port='5432', user='postgres',
@@ -83,25 +77,14 @@ class DatabaseConnection:
             obj_feature_matrix.extend(pickle.loads(image_row[1]))
         return {"images": images, "data_matrix": np.array(obj_feature_matrix)}
 
-    def get_correct_labels_for_given_images(self, image_names = None, label_type=None):
+    def get_correct_labels_for_given_images(self, image_names=None, label_type=None, tablename='metadata'):
         conn = self.get_db_connection()
         cursor = conn.cursor()
-        tablename = 'metadata'
+        # tablename = 'metadata'
         if not image_names:
-            query = "SELECT imagename, {1} FROM {0}".format(tablename, self.label_type_map.get(label_type))
+            query = "SELECT imagename, {1} FROM {0}".format(tablename, label_type)
         else:
-            query = "SELECT imagename, {1} FROM {0} WHERE imagename IN {2}".format(tablename, self.label_type_map.
-                                                                                   get(label_type), tuple(image_names))
-        cursor.execute(query)
-        result = cursor.fetchall()
-        return result
-
-    def get_metadata_for_task_8(self,image_names=None):
-        conn = self.get_db_connection()
-        cursor = conn.cursor()
-        tablename='metadata'
-        query = "SELECT imagename,gender,accessories,aspectofhand FROM {0} WHERE imagename IN {1}"\
-            .format(tablename, tuple(image_names))
+            query = "SELECT imagename, {1} FROM {0} WHERE imagename IN {2}".format(tablename, label_type, tuple(image_names))
         cursor.execute(query)
         result = cursor.fetchall()
         return result
