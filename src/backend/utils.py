@@ -139,14 +139,13 @@ def get_image_names_in_a_folder(relative_folder_path):
     """
 
     data_dir = get_data_directory()
-    path = str(Path(data_dir + relative_folder_path)) + '\*.jpg'
+    path = str(Path(data_dir + relative_folder_path)) + '/*.jpg'
     files = glob.glob(path)
     image_names = [os.path.basename(x) for x in files]
     return image_names
 
 def get_svd_image_data_from_folder(relative_folder_path, k=8):
     """
-
     :param relative_folder_path: here give the path with a '/' ahead e.g. '/Labelled/Set2'
     :return:
     data_matrix after applying SVD on it and also the image names present inside the relative_folder_path
