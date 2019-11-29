@@ -34,17 +34,15 @@ def get_image_directory(content_type='database_images'):
     elif content_type == 'classification_images':
         return str(Path(data_dir + '/phase3_sample_data'))
 
-def read_from_database(model,label=None):
-    database_connection = DatabaseConnection()
+# def read_from_database(model,label=None):
+#     database_connection = DatabaseConnection()
    
-    if label==None:
-        img_data_matrix_dict=database_connection.get_object_feature_matrix_from_db(tablename=model)
-        return img_data_matrix_dict
-
+#     if label==None:
+#         img_data_matrix_dict=database_connection.get_object_feature_matrix_from_db(tablename=model)
+#         return img_data_matrix_dict
 
 def get_dot_distance(vector1, vector2):
     return np.dot(vector1, vector2)
-
 
 def get_cosine_similarity(vector1, vector2):
     return spatial.distance.cosine(vector1, vector2)
@@ -134,7 +132,6 @@ def get_similarity_score(database_images_latent_vectors, query_image_latent_vect
         similar_images[imageName] = distance
     return similar_images
 
-     
 def save_to_pickle(object_to_save, file_name):
     pickle_directory = get_pickle_directory()
     with open(os.path.join(pickle_directory,file_name), 'wb') as f:
@@ -176,10 +173,8 @@ def get_svd_image_data_from_folder(relative_folder_path, k=10):
     svd_image_data = svd_obj.get_transformed_data(data_matrix, k)
     return svd_image_data, data_image_dict['images']
 
-
 def get_filtered_images_by_label(labelled_images, filter_by):
     return [x[0] for x in labelled_images if filter_by in x[1]]
-
 
 def convert_tuple_to_dict(tuple):
     dict = {}
