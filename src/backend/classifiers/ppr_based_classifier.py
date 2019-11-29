@@ -45,8 +45,25 @@ class PPRClassifier:
         ranked_images_using_dorsal = self.get_ranked_images(pie_with_dorsal, total_image_names)
         ranked_images_using_palmer = self.get_ranked_images(pie_with_palmer, total_image_names)
 
-        images_with_labels = [(img, "dorsal") if ranked_images_using_dorsal[img] > ranked_images_using_palmer[img] else (img, "palmar") for img in unlabeled_image_names]
+        # print("Pie = ", ranked_images_using_dorsal)
 
+
+
+        similarity_scores = list(pie_with_dorsal.flatten())
+        scores, images = list(zip(*sorted(zip(similarity_scores, total_image_names), reverse=True)))
+        sorted_tuples = list(zip(images, scores))
+
+        ranked_images_using_dorsal = self.get_indexed_images(sorted_tuples)
+
+        total_images = len(sorted_tuples)
+        print(sorted_tuples)
+        print("%%%%%%%%%")
+        print(sorted_tuples[0])
+        # images_with_labels = [(sorted_tuples[i][0], "dorsal") if i < (total_images/2) else (sorted_tuples[i][0], "palmar") for i in range(total_images)]
+
+        images_with_labels = [(img, "dorsal") if ranked_images_using_dorsal[img] < (total_images/2) else (img, "palmar") for img in unlabeled_image_names]
+        print(images_with_labels)
+        #
         correct_labels = db_conn.get_correct_labels_for_given_images(image_names=unlabeled_image_names, label_type="aspectOfHand")
 
         acc = calculate_classification_accuracy(convert_tuple_to_dict(images_with_labels), convert_tuple_to_dict(correct_labels))
@@ -64,5 +81,11 @@ class PPRClassifier:
         for i in range(len(total_image_names)):
             ranked_images[total_image_names[i]] = similarity_scores[i]
 
+        return ranked_images
+
+    def get_indexed_images(self, sorted_tuples):
+        ranked_images = {}
+        for i in range(len(sorted_tuples)):
+            ranked_images[sorted_tuples[i][0]] = i
         return ranked_images
 
