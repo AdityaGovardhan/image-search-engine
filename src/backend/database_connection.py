@@ -16,6 +16,10 @@ class DatabaseConnection:
                                 password='postgres', dbname='Hands_db')
         return connection
 
+    ####################
+    # Creation Queries #
+    ####################
+
     def create_feature_model_table(self, tablename):
         connection = self.get_db_connection()
         cursor = connection.cursor()
@@ -36,16 +40,9 @@ class DatabaseConnection:
                            format(tablename), feature_vectors)
         connection.commit()
 
-    def get_feature_data_for_image(self, tablename, imageName):
-        """
-        Returns the feature vector for an image for a model
-        Output Shape: [feature vector]
-        """
-        connection = self.get_db_connection()
-        cursor = connection.cursor()
-        cursor.execute("SELECT features from {0} where imagename = '{1}'".format(tablename, imageName))
-        result_row = cursor.fetchone()
-        return np.array(pickle.loads(result_row[0]))
+    #################
+    # Table Queries #
+    #################
 
     def get_object_feature_matrix_from_db(self, tablename, label=None, label_type=None, metadata_table="metadata"):
         """
@@ -80,7 +77,6 @@ class DatabaseConnection:
     def get_correct_labels_for_given_images(self, image_names=None, label_type=None, tablename='metadata'):
         conn = self.get_db_connection()
         cursor = conn.cursor()
-        # tablename = 'metadata'
         if not image_names:
             query = "SELECT imagename, {1} FROM {0}".format(tablename, label_type)
         else:
@@ -89,12 +85,11 @@ class DatabaseConnection:
         result = cursor.fetchall()
         return result
 
-    def HOG_descriptor_from_image_ids(self, image_ids, tablename='histogram_of_gradients'):
-        """
-        To be deprecated
-        """
+    #################
+    # Image Queries #
+    #################
 
-        # tablename = "histogram_of_gradients"
+    def HOG_descriptor_from_image_ids(self, image_ids, tablename='histogram_of_gradients'):
         connection = self.get_db_connection()
         cursor = connection.cursor()
         query = "SELECT * FROM {0} WHERE imagename IN {1}".format(tablename, tuple(image_ids))
@@ -107,10 +102,20 @@ class DatabaseConnection:
             obj_feature_matrix.extend(pickle.loads(image_row[1]))
         return {"images": images, "data_matrix": np.array(obj_feature_matrix)}
 
+    def get_feature_data_for_image(self, tablename, imageName):
+        """
+        Returns the feature vector for an image for a model
+        Output Shape: [feature vector]
+        """
+        connection = self.get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT features from {0} where imagename = '{1}'".format(tablename, imageName))
+        result_row = cursor.fetchone()
+        return np.array(pickle.loads(result_row[0]))
 
 
 if __name__ == "__main__":
     database_connection = DatabaseConnection()
     conn = database_connection.get_db_connection()
-    o_f_mat = database_connection.get_object_feature_matrix_from_db('color_moments')['data_matrix'].shape
+    o_f_mat = database_connection.get_object_feature_matrix_from_db('histogram_of_gradients')['data_matrix'].shape
 
