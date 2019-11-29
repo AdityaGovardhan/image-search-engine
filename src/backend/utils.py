@@ -267,3 +267,10 @@ def get_result_metrics(classifier_name, y_expected, y_predicted):
 
     result = {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1}
     return result
+
+def get_image_names_from_tuples(image_score_tuple):
+    image_names = []
+    for each_tuple in image_score_tuple:
+        image_names.append(each_tuple[0])
+
+    return image_names
