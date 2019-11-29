@@ -9,3 +9,5 @@ static/*.jpg
 staticfiles/*.jpg
 staticfiles/admin/*
 .vscode
+src/Data/pickle/page_rank_interim.pickle
+*.pickle

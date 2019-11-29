@@ -54,7 +54,7 @@ class PPRClassifier:
         print("********************************************")
         print("Accuracy = ", acc)
 
-        return images_with_labels
+        return images_with_labels, acc
 
 
 
