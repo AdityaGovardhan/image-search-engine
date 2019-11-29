@@ -2,7 +2,9 @@ import sys
 
 import glob
 import numpy as np
+import pandas as pd
 from scipy import spatial
+from sklearn.metrics import confusion_matrix, accuracy_score, recall_score, precision_score, f1_score
 import matplotlib.pyplot as plt
 import matplotlib
 
@@ -33,13 +35,6 @@ def get_image_directory(content_type='database_images'):
         return str(Path(data_dir + '/images'))
     elif content_type == 'classification_images':
         return str(Path(data_dir + '/phase3_sample_data'))
-
-# def read_from_database(model,label=None):
-#     database_connection = DatabaseConnection()
-   
-#     if label==None:
-#         img_data_matrix_dict=database_connection.get_object_feature_matrix_from_db(tablename=model)
-#         return img_data_matrix_dict
 
 def get_dot_distance(vector1, vector2):
     return np.dot(vector1, vector2)
@@ -97,7 +92,7 @@ def get_most_m_similar_images(data_with_images, query_image_feature_vector, Vt, 
     imageNames = data_with_images.get('images')
     database_images_latent_vectors = np.dot(db_data_matrix, np.transpose(Vt))
     query_image_latent_vector = np.dot(np.array(query_image_feature_vector),Vt.T)
-    return get_top_m_tuples_by_similarity_score(database_images_latent_vectors, 
+    return get_top_m_tuples_by_similarity_score(database_images_latent_vectors,
                                 query_image_latent_vector, imageNames, m+1) #+1 because the db contains the query image also
 
 def get_top_m_tuples_by_similarity_score(database_images_latent_vectors, query_image_latent_vector, imageNames, m, distance_measure = "Euclidean"):
@@ -192,3 +187,74 @@ def calculate_classification_accuracy(pred_labels, correct_labels):
             cnt += 1
     print(cnt)
     return (cnt/len(pred_labels))*100
+
+def get_train_and_test_dataframes_from_db(train_table, train_table_metadata, test_table, num_dims=None):
+
+    label_map = {"dorsal": 0, "palmar": 1}
+
+    # retrieve data
+    db = DatabaseConnection()
+    train_dataset = db.get_object_feature_matrix_from_db(train_table)
+    test_dataset = db.get_object_feature_matrix_from_db(test_table)
+
+    # get out data matrix
+    train_data = train_dataset['data_matrix']
+    train_images = train_dataset['images']
+    test_data = test_dataset['data_matrix']
+    test_images = test_dataset['images']
+
+    # svd transform
+    if num_dims == None:
+        tf_train_data = train_data
+        tf_test_data = test_data
+    else:
+        svd = SingularValueDecomposition(num_dims)
+        tf_train_data = svd.fit_transform(train_data)
+        tf_test_data = svd.transform(test_data)
+
+    # convert list of tuples to dict
+    train_labels_map = dict(db.get_correct_labels_for_given_images(train_images, 'aspectOfHand', train_table_metadata))
+    exp_test_labels_map = dict(db.get_correct_labels_for_given_images(test_images, 'aspectOfHand'))
+
+    # dataframe setup starts here
+
+    # train_df
+    train_col_names = ['imagename', 'hog_svd_descriptor', 'label']
+    train_df = pd.DataFrame(columns=train_col_names)
+
+    for i, image in enumerate(train_images):
+        temp = train_labels_map[image]
+        label = temp.split(' ')[0]
+
+        train_df.loc[len(train_df)] = [image, tf_train_data[i], label_map[label]]
+
+    #test_df
+    test_col_names = ['imagename', 'hog_svd_descriptor', 'expected_label', 'predicted_label']
+    test_df = pd.DataFrame(columns=test_col_names)
+
+    for i, image in enumerate(test_images):
+        temp = exp_test_labels_map[image]
+        label = temp.split(' ')[0]
+
+        test_df.loc[len(test_df)] = [image, tf_test_data[i], label_map[label], 'null']
+
+    return train_df, test_df
+
+def get_result_metrics(classifier_name, y_expected, y_predicted):
+
+    y_expected = np.array(y_expected, dtype=int)
+    y_predicted = np.array(y_predicted, dtype=int)
+
+    # Predicting the Test set results
+    print("Results for classifier {0}".format(classifier_name))
+    accuracy = accuracy_score(y_expected, y_predicted)
+    print("Accuracy score is: {}".format(accuracy))
+    precision = precision_score(y_expected, y_predicted)
+    print("Precision score is: {}".format(precision))
+    recall = recall_score(y_expected, y_predicted)
+    print("Recall score is: {}".format(recall))
+    f1 = f1_score(y_expected, y_predicted)
+    print("F1 score is: {}".format(f1))
+    print("------Confusion Matirx------")
+    print(confusion_matrix(y_expected, y_predicted))
+    return accuracy, precision, recall, f1
