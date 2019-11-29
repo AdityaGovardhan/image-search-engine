@@ -28,6 +28,7 @@ class DataPreProcessor:
         feature_models = []
 
         feature_models.append("histogram_of_gradients")
+        # feature_models.append("histogram_of_gradients_30")
 
         processes = []
         for i, feature in enumerate(feature_models):
