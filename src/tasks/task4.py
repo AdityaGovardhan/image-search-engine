@@ -25,13 +25,14 @@ def execute_task4(request):
 
     images_with_labels = [()]
     ppr_obj = PPRClassifier()
+    accuracy = 0
     if(labelled_folder_path[0] != '/'):
         labelled_folder_path = "/"+labelled_folder_path
     if (unlabelled_folder_path[0] != '/'):
         unlabelled_folder_path = "/" + unlabelled_folder_path
 
     if(classifier == "Personalized Page Rank"):
-        images_with_labels = ppr_obj.get_predicted_labels(labelled_folder_path, unlabelled_folder_path)
+        images_with_labels, accuracy = ppr_obj.get_predicted_labels(labelled_folder_path, unlabelled_folder_path)
 
     elif (classifier == "Support Vector Machine"):
         print(classifier)
@@ -39,5 +40,5 @@ def execute_task4(request):
     elif (classifier == "Decision Tree Classifier"):
         print(classifier)
 
-    return render(request, 'visualize_images.html', {'images': images_with_labels, "from_task": "task4"})
+    return render(request, 'visualize_images.html', {'images': images_with_labels, "from_task": "task4", "accuracy": accuracy, "classifier":classifier})
     # return HttpResponse('You received a response'+json.dumps(similar_objects), status=200)

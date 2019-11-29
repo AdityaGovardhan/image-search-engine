@@ -18,7 +18,9 @@ task_6_relevance_feedbacks = (
 
 
 class Task1Model(models.Model):
-    number_of_latent_semantics = models.CharField(max_length=2)
+    number_of_latent_semantics = models.CharField(max_length=3, verbose_name="Number of Latent Semantics")
+    labelled_folder_name = models.CharField(max_length=100, verbose_name="Labelled Folder Path")
+    unlabelled_folder_name = models.CharField(max_length=100, verbose_name="Unlabelled Folder Path")
 
 
 class Task2Model(models.Model):
