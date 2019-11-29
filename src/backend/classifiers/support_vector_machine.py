@@ -5,7 +5,7 @@ from cvxopt import matrix, solvers
 
 
 class SupportVectorMachine(object):
-    def __init__(self, C=1, kernel='linear', power=3, gamma=None):
+    def __init__(self, C=1, kernel='poly', power=3, gamma=None):
         self.C = C
         self.kernel_name = kernel
         self.power = power

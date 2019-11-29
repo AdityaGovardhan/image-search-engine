@@ -257,4 +257,6 @@ def get_result_metrics(classifier_name, y_expected, y_predicted):
     print("F1 score is: {}".format(f1))
     print("------Confusion Matirx------")
     print(confusion_matrix(y_expected, y_predicted))
-    return accuracy, precision, recall, f1
+
+    result = {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1}
+    return result

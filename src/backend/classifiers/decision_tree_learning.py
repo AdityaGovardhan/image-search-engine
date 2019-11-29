@@ -19,16 +19,19 @@ class DecisionTreeLearning:
         self.model = None
         pass
 
-    def fit(self, train_df):
-        X_train, y_train = np.vstack(train_df['hog_svd_descriptor'].values), train_df['label'].to_numpy(dtype=int)
-
+    def fit(self, X, y):
         self.model = DecisionTreeClassifier(random_state=self.random_state, min_samples_leaf=self.min_samples_leaf)
-        self.model.fit(X_train, y_train)
+        self.model.fit(X, y)
 
-    def predict(self, test_df):
-        for i in range(len(test_df.index)):
-            pred_label = self.model.predict(test_df['hog_svd_descriptor'][i].reshape(1, -1))
-            test_df['predicted_label'][i] = pred_label[0]
+    def predict(self, X):
+
+        y = list()
+
+        for i in range(len(X)):
+            pred_label = self.model.predict(X)
+            y.append(pred_label[0])
+
+        return y
 
 # testing
 if __name__ == "__main__":
@@ -40,10 +43,11 @@ if __name__ == "__main__":
     test_table = 'histogram_of_gradients_unlabelled_set1'
 
     train_df, test_df = get_train_and_test_dataframes_from_db(train_table, train_table_metadata, test_table, num_dims=k)
+    X_train, y_train = np.vstack(train_df['hog_svd_descriptor'].values), train_df['label'].to_numpy(dtype=int)
 
     dtl = DecisionTreeLearning()
-    dtl.fit(train_df)
-    dtl.predict(test_df)
+    dtl.fit(X_train, y_train)
+    test_df['predicted_label'] = dtl.predict(np.vstack(test_df['hog_svd_descriptor'].values))
 
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):
         print(test_df.sort_values('imagename'))
