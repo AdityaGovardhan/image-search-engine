@@ -48,7 +48,7 @@ def execute_task6(request):
         print('PPR')
         init_ranking,Vt=rf.get_init_ranking(obj_feature_matrix=obj_feature_matrix,q=q)
         return render(request, 'visualize_images.html', {'images': init_ranking, "from_task": "task6", "rel_type": rel_feedback_type,"q":q_name, "t":m})
-        return
+        
         
 @csrf_exempt
 def process_feedback(request):
