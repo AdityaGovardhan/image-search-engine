@@ -24,7 +24,7 @@ class Task3Form(ModelForm):
 class Task4Form(ModelForm):
     class Meta:
         model = models.Task4Model
-        fields = ['classifier']
+        fields = ['classifier', 'dataset']
 
 
 class Task5Form(ModelForm):

@@ -16,6 +16,13 @@ task_6_relevance_feedbacks = (
         ('None', 'None'),
     )
 
+datasets = (
+        ('set1', 'set1'),
+        ('set2', 'set2'),
+        ('set3', 'set3'),
+        ('set4', 'set4'),
+    )
+
 
 class Task1Model(models.Model):
     number_of_latent_semantics = models.CharField(max_length=3, verbose_name="Number of Latent Semantics")
@@ -34,10 +41,13 @@ class Task3Model(models.Model):
     folder_name = models.CharField(max_length=100, verbose_name="Folder Path")
     user_images = models.CharField(max_length=200, verbose_name="User Preferred Images(Personalized)")
 
+
 class Task4Model(models.Model):
     classifier = models.CharField(max_length=6, choices=classifiers, default='Support Vector Machine')
+    dataset = models.CharField(max_length=6, choices=datasets, default='set1')
     labelled_folder_name = models.CharField(max_length=100, verbose_name="Labelled Folder Path")
     unlabelled_folder_name = models.CharField(max_length=100, verbose_name="Unlabelled Folder Path")
+
 
 class Task5Model(models.Model):
     number_of_layers = models.CharField(max_length=2)
