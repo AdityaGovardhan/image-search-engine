@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import pickle
 from singular_value_decomposition import SingularValueDecomposition
+from sklearn.decomposition import PCA
 
 
 ALPHA = 0.85
@@ -188,9 +189,10 @@ def calculate_classification_accuracy(pred_labels, correct_labels):
     print(cnt)
     return (cnt/len(pred_labels))*100
 
-def get_train_and_test_dataframes_from_db(train_table, train_table_metadata, test_table, num_dims=None):
 
-    label_map = {"dorsal": 0, "palmar": 1}
+def get_train_and_test_dataframes_from_db(train_table, train_table_metadata, test_table, num_dims=None, algo="svd"):
+
+    label_map = {"dorsal": -1, "palmar": 1}
 
     # retrieve data
     db = DatabaseConnection()
@@ -208,9 +210,14 @@ def get_train_and_test_dataframes_from_db(train_table, train_table_metadata, tes
         tf_train_data = train_data
         tf_test_data = test_data
     else:
-        svd = SingularValueDecomposition(num_dims)
-        tf_train_data = svd.fit_transform(train_data)
-        tf_test_data = svd.transform(test_data)
+        if algo == "pca":
+            svd = PCA(n_components=num_dims)
+            tf_train_data = svd.fit_transform(train_data)
+            tf_test_data = svd.transform(test_data)
+        elif algo == "svd":
+            svd = SingularValueDecomposition(num_dims)
+            tf_train_data = svd.fit_transform(train_data)
+            tf_test_data = svd.transform(test_data)
 
     # convert list of tuples to dict
     train_labels_map = dict(db.get_correct_labels_for_given_images(train_images, 'aspectOfHand', train_table_metadata))
@@ -237,24 +244,24 @@ def get_train_and_test_dataframes_from_db(train_table, train_table_metadata, tes
         label = temp.split(' ')[0]
 
         test_df.loc[len(test_df)] = [image, tf_test_data[i], label_map[label], 'null']
-
+    print(train_df, test_df)
     return train_df, test_df
+
 
 def get_result_metrics(classifier_name, y_expected, y_predicted):
 
     y_expected = np.array(y_expected, dtype=int)
     y_predicted = np.array(y_predicted, dtype=int)
-
     # Predicting the Test set results
     print("Results for classifier {0}".format(classifier_name))
     accuracy = accuracy_score(y_expected, y_predicted)
-    print("Accuracy score is: {}".format(accuracy))
+    # print("Accuracy score is: {}".format(accuracy))
     precision = precision_score(y_expected, y_predicted)
-    print("Precision score is: {}".format(precision))
+    # print("Precision score is: {}".format(precision))
     recall = recall_score(y_expected, y_predicted)
-    print("Recall score is: {}".format(recall))
+    # print("Recall score is: {}".format(recall))
     f1 = f1_score(y_expected, y_predicted)
-    print("F1 score is: {}".format(f1))
+    # print("F1 score is: {}".format(f1))
     print("------Confusion Matirx------")
     print(confusion_matrix(y_expected, y_predicted))
 

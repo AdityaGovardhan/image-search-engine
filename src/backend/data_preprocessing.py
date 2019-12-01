@@ -1,9 +1,11 @@
 from database_connection import DatabaseConnection
 import os
 from histogram_of_gradients import HistogramOfGradients
+from local_binary_pattern import LocalBinaryPattern
 from multiprocessing import Process
 import os
 from pathlib import Path
+import glob
 
 
 class DataPreProcessor:
@@ -20,8 +22,8 @@ class DataPreProcessor:
         self.process_metadata()
         self.process_classification_metadata()
 
-        self.DATABASE_IMAGES_PATH = str(Path(str(Path(os.getcwd()).parent) + "/Data/images"))
-        self.CLASSIFICATION_IMAGES_PATH = str(Path(str(Path(os.getcwd()).parent) + "/Data/phase3_sample_data"))
+        self.DATABASE_IMAGES_PATH = str(Path(str(Path(os.getcwd()).parent) + "/images"))
+        self.CLASSIFICATION_IMAGES_PATH = str(Path(str(Path(os.getcwd()).parent) + "/phase3_sample_data"))
 
         feature_models = []
 
@@ -38,7 +40,7 @@ class DataPreProcessor:
         # classification specific
 
         charas = ["Labelled", "Unlabelled"]
-        sets = ["Set1", "Set2"]
+        sets = ["Set1", "Set2", "Set3", "Set4"]
 
         for chara_ in charas:
             for set_ in sets:
@@ -47,6 +49,7 @@ class DataPreProcessor:
                 feature_models = []
 
                 feature_models.append("histogram_of_gradients" + "_" + chara_ + "_" + set_)
+                feature_models.append("local_binary_pattern" + "_" + chara_ + "_" + set_)
 
                 processes = []
                 for i, feature in enumerate(feature_models):
@@ -85,9 +88,11 @@ class DataPreProcessor:
 
     def process_classification_metadata(self):
 
-        metadata_files = ['labelled_set1.csv', 'labelled_set2.csv', 'unlabelled_set1.csv', 'unlabelled_set2.csv']
-
+        # metadata_files = ['labelled_set1.csv', 'labelled_set2.csv', 'unlabelled_set1.csv', 'unlabelled_set2.csv']
         data_folder = str(Path(str(Path(os.getcwd()).parent) + "/Data/phase3_sample_data"))
+        extension = 'csv'
+        os.chdir(data_folder)
+        metadata_files = [os.path.basename(x) for x in glob.glob('*.{}'.format(extension))]
 
         connection = self.database_connection.get_db_connection()
 
@@ -128,10 +133,14 @@ class DataPreProcessor:
         self.database_connection.insert_feature_data(feature, feature_vectors)
 
     def perform_classification_feature_model(self, feature, path):
-        histogram_of_gradients = HistogramOfGradients(path)
-        feature_vectors = histogram_of_gradients.get_image_vectors()
-
         self.database_connection.create_feature_model_table(feature)
+        if "histogram_of_gradients" in feature:
+            histogram_of_gradients = HistogramOfGradients(path)
+            feature_vectors = histogram_of_gradients.get_image_vectors()
+        elif "local_binary_pattern" in feature:
+            local_binary_pattern = LocalBinaryPattern(path)
+            feature_vectors = local_binary_pattern.get_image_vectors()
+
         self.database_connection.insert_feature_data(feature, feature_vectors)
 
 

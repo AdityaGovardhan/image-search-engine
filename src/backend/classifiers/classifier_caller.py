@@ -1,47 +1,72 @@
 from backend.classifiers import support_vector_machine, decision_tree_learning
+from sklearn.svm import SVC
 
 # import sys
 import numpy as np
 import pandas as pd
 # sys.path.append('..')
-
 import backend.utils as utils
 
+
 class ClassifierCaller:
-    def __init__(self, classifier_name, training_dataset, testing_dataset):
+    def __init__(self, classifier_name, training_dataset, testing_dataset, dimensionality_algo = "svd"):
         self.classifier_name = classifier_name
         self.training_dataset = training_dataset
         self.testing_dataset = testing_dataset
         self.test_df = None
         self.result = None
+        self.algo = dimensionality_algo
 
     def call_classifier(self):
-        if(self.classifier_name  == "Personalized Page Rank"):
-            # Talk to Vibhu
-            # images_with_labels, accuracy = ppr_obj.get_predicted_labels(labelled_folder_path, unlabelled_folder_path)
-            return
-        else:
-            if (self.classifier_name  == "Support Vector Machine"):
-                classifier = support_vector_machine.SupportVectorMachine()
+        if self.classifier_name == "Support Vector Machine":
+            classifier = support_vector_machine.SupportVectorMachine()
 
-            elif (self.classifier_name  == "Decision Tree Classifier"):
-                classifier = decision_tree_learning.DecisionTreeLearning()
-        
-        k = 15
+        elif self.classifier_name == "Decision Tree Classifier":
+            classifier = decision_tree_learning.DecisionTreeLearning()
 
-        train_table = 'histogram_of_gradients_labelled_' + self.training_dataset.lower()
-        train_table_metadata = 'metadata_labelled_' + self.training_dataset.lower()
-        test_table = 'histogram_of_gradients_unlabelled_' + self.testing_dataset.lower()
+        if self.algo == "pca":
+            k = 10
 
-        train_df, self.test_df = utils.get_train_and_test_dataframes_from_db(train_table, train_table_metadata, test_table, num_dims=k)
-        X_train, y_train = np.vstack(train_df['hog_svd_descriptor'].values), train_df['label'].to_numpy(dtype=int)
+            train_table = 'local_binary_pattern_labelled_' + self.training_dataset.lower()
+            train_table_metadata = 'metadata_labelled_' + self.training_dataset.lower()
+            test_table = 'local_binary_pattern_unlabelled_' + self.testing_dataset.lower()
+
+            train_df, self.test_df = utils.get_train_and_test_dataframes_from_db(train_table, train_table_metadata,
+                                                                                 test_table, num_dims=k, algo="pca")
+
+        elif self.algo == "svd":
+            k = 15
+            train_table = 'histogram_of_gradients_labelled_' + self.training_dataset.lower()
+            train_table_metadata = 'metadata_labelled_' + self.training_dataset.lower()
+            test_table = 'histogram_of_gradients_unlabelled_' + self.testing_dataset.lower()
+
+            train_df, self.test_df = utils.get_train_and_test_dataframes_from_db(train_table, train_table_metadata,
+                                                                                 test_table, num_dims=k, algo="svd")
+        X_train, y_train = np.vstack(train_df['hog_svd_descriptor'].values), train_df['label'].to_numpy(
+                dtype=int)
 
         classifier.fit(X_train, y_train)
-        self.test_df['predicted_label'] = classifier.predict(np.vstack(self.test_df['hog_svd_descriptor'].values))
+        self.test_df['predicted_label'] = classifier.predict(
+            np.vstack(self.test_df['hog_svd_descriptor'].values))
 
+
+    # clf = SVC(kernel='poly')
+    # clf.fit(X_train, y_train)
+    # x = clf.predict(np.vstack(self.test_df['hog_svd_descriptor'].values))
+    # result = utils.get_result_metrics("self.classifier_name", self.test_df['expected_label'],
+    #                                        x)
+    # print("results")
+    # print(result)
 
     def get_result(self):
         # Talk to Vibhu about returning (image_name, label(type = dorsal/palmar? 0/1?)) 
         self.result = utils.get_result_metrics(self.classifier_name, self.test_df['expected_label'], self.test_df['predicted_label'])
+        print(self.result)
+        images_with_labels = []
+        for index, row in self.test_df.iterrows():
+            if row['predicted_label'] == -1:
+                images_with_labels.append((row['imagename'], 'dorsal'))
+            else:
+                images_with_labels.append((row['imagename'], 'palmar'))
 
-        return self.result
+        return self.result, images_with_labels

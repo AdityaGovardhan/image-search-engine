@@ -5,6 +5,7 @@ from multiprocessing import Manager, Pool
 import warnings
 import pickle
 warnings.filterwarnings("ignore")
+import numpy as np
 
 
 class HistogramOfGradients:
@@ -21,7 +22,7 @@ class HistogramOfGradients:
         (HoG_descriptors, hogImage) = feature.hog(hand_image, orientations=9, pixels_per_cell=(8, 8),
                                                   cells_per_block=(2, 2), transform_sqrt=True, block_norm="L2",
                                                   visualize=True)
-        self.x.append({"imageName": file, "features": pickle.dumps([HoG_descriptors.tolist()])})
+        self.x.append({"imageName": file, "features": pickle.dumps([list(np.around(np.array(HoG_descriptors), 2))])})
 
     def get_image_vectors(self):
         manager = Manager()
