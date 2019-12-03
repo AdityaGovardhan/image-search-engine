@@ -69,9 +69,15 @@ class DatabaseConnection:
         db_output = cursor.fetchall()
         obj_feature_matrix = []
         images = []
-        for image_row in db_output:
-            images.append(image_row[0])
-            obj_feature_matrix.extend(pickle.loads(image_row[1]))
+        if "sift" in tablename:
+            for image_row in db_output:
+                images.append(image_row[0])
+                obj_feature_matrix.append(pickle.loads(image_row[1]))
+        else:
+            for image_row in db_output:
+                images.append(image_row[0])
+                obj_feature_matrix.extend(pickle.loads(image_row[1]))
+            
         return {"images": images, "data_matrix": np.array(obj_feature_matrix)}
 
     def get_correct_labels_for_given_images(self, image_names=None, label_type=None, tablename='metadata'):

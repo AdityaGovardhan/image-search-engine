@@ -1,11 +1,11 @@
 from database_connection import DatabaseConnection
-import os
 from histogram_of_gradients import HistogramOfGradients
 from local_binary_pattern import LocalBinaryPattern
 from multiprocessing import Process
 import os
 from pathlib import Path
 import glob
+from sift import SIFT
 
 
 class DataPreProcessor:
@@ -16,17 +16,16 @@ class DataPreProcessor:
         3) Pass this vector to all the dimension reduction technique to get latent semantics.
         4) Put this latent semantic of each image from each model and technique with its metadata inside database
         '''
-
+        self.root_path = str(Path(str(Path(os.getcwd()).parent))) + "/Data/"
         self.database_connection = DatabaseConnection()
 
         self.process_metadata()
         self.process_classification_metadata()
 
-        self.DATABASE_IMAGES_PATH = str(Path(str(Path(os.getcwd()).parent) + "/images"))
-        self.CLASSIFICATION_IMAGES_PATH = str(Path(str(Path(os.getcwd()).parent) + "/phase3_sample_data"))
+        self.DATABASE_IMAGES_PATH = self.root_path + "/images"
+        self.CLASSIFICATION_IMAGES_PATH = self.root_path + "/phase3_sample_data"
 
         feature_models = []
-
         feature_models.append("histogram_of_gradients")
         # feature_models.append("histogram_of_gradients_30")
 
@@ -42,6 +41,7 @@ class DataPreProcessor:
 
         charas = ["Labelled", "Unlabelled"]
         sets = ["Set1", "Set2", "Set3", "Set4"]
+        # sets = ["Set1"]
 
         for chara_ in charas:
             for set_ in sets:
@@ -51,6 +51,7 @@ class DataPreProcessor:
 
                 feature_models.append("histogram_of_gradients" + "_" + chara_ + "_" + set_)
                 feature_models.append("local_binary_pattern" + "_" + chara_ + "_" + set_)
+                feature_models.append("sift" + "_" + chara_ + "_" + set_)
 
                 processes = []
                 for i, feature in enumerate(feature_models):
@@ -60,10 +61,9 @@ class DataPreProcessor:
                 for i in range(len(processes)):
                     processes[i].join()
 
-
     # This function will read all the metadata of input images and put those metadata details in database.
     def process_metadata(self):
-        csv_file_path = str(Path(str(Path(os.getcwd()).parent) + "/Data/HandInfo.csv"))
+        csv_file_path = self.root_path + "/HandInfo.csv"
         connection = self.database_connection.get_db_connection()
         cursor = connection.cursor()
         cursor.execute("""DROP Table IF EXISTS metadata;""")
@@ -90,7 +90,7 @@ class DataPreProcessor:
     def process_classification_metadata(self):
 
         # metadata_files = ['labelled_set1.csv', 'labelled_set2.csv', 'unlabelled_set1.csv', 'unlabelled_set2.csv']
-        data_folder = str(Path(str(Path(os.getcwd()).parent) + "/Data/phase3_sample_data"))
+        data_folder = self.root_path + "/phase3_sample_data"
         extension = 'csv'
         os.chdir(data_folder)
         metadata_files = [os.path.basename(x) for x in glob.glob('*.{}'.format(extension))]
@@ -141,7 +141,10 @@ class DataPreProcessor:
         elif "local_binary_pattern" in feature:
             local_binary_pattern = LocalBinaryPattern(path)
             feature_vectors = local_binary_pattern.get_image_vectors()
-
+        elif "sift" in feature:
+            sift = SIFT(path)
+            sift.read_and_clusterize(150)
+            feature_vectors = sift.calculate_centroids_histogram()
         self.database_connection.insert_feature_data(feature, feature_vectors)
 
 
