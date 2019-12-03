@@ -37,6 +37,7 @@ class Task1_Classifier:
         predicted_labels = []
         for images_name, label in zip(image_names, label_flags):
             if label[0]:
+
                 predicted_labels.append((images_name, DORSAL))
             else:
                 predicted_labels.append((images_name, PALMAR))
