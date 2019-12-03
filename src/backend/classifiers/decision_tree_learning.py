@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append('..')
 
 from database_connection import DatabaseConnection
@@ -9,8 +10,10 @@ from numpy.linalg import svd
 import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import plot_tree
 import pprint
+
 
 class DecisionTreeLearning:
     def __init__(self, random_state=0, min_samples_leaf=10):
@@ -20,22 +23,23 @@ class DecisionTreeLearning:
         pass
 
     def fit(self, X, y):
-        self.model = DecisionTreeClassifier(random_state=self.random_state, min_samples_leaf=self.min_samples_leaf)
+        # self.model = DecisionTreeClassifier(random_state=self.random_state, min_samples_leaf=self.min_samples_leaf)
+        self.model = RandomForestClassifier()
+        print(X, y)
         self.model.fit(X, y)
 
     def predict(self, X):
-
         y = list()
 
         for i in range(len(X)):
             pred_label = self.model.predict(X)
             y.append(pred_label[0])
-
+        print(y)
         return y
+
 
 # testing
 if __name__ == "__main__":
-
     k = 15
 
     train_table = 'histogram_of_gradients_labelled_set1'

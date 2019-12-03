@@ -7,21 +7,25 @@ import backend.utils as utils
 
 
 class ClassifierCaller:
-    def __init__(self, classifier_name, training_dataset, testing_dataset, dimensionality_algo="svd"):
+    def __init__(self, classifier_name, training_dataset, testing_dataset, kernel, dimensionality_algo="svd"):
         self.classifier_name = classifier_name
         self.training_dataset = training_dataset
         self.testing_dataset = testing_dataset
         self.test_df = None
         self.result = None
         self.algo = dimensionality_algo
+        self.kernel = kernel
 
     def call_classifier(self):
         if self.classifier_name == "Support Vector Machine":
-            classifier = support_vector_machine.SupportVectorMachine(kernel="poly")
+            if not self.kernel:
+                self.kernel = 'linear'
+            classifier = support_vector_machine.SupportVectorMachine(kernel=self.kernel)
             self.algo = "sift"
 
         elif self.classifier_name == "Decision Tree Classifier":
             classifier = decision_tree_learning.DecisionTreeLearning()
+            self.algo = "sift"
 
         if self.algo == "sift":
             train_table = 'sift_labelled_' + self.training_dataset.lower()
@@ -29,7 +33,7 @@ class ClassifierCaller:
             test_table = 'sift_unlabelled_' + self.testing_dataset.lower()
 
             train_df, self.test_df = utils.get_train_and_test_dataframes_from_db(train_table, train_table_metadata,
-                                                                                 test_table, algo="sift")
+                                                                                 test_table, algo=self.algo)
 
         elif self.algo == "pca":
             k = 10

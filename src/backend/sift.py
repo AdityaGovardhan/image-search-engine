@@ -9,14 +9,14 @@ from multiprocessing import Manager, Pool
 class SIFT:
     def __init__(self, INPUT_DATA_PATH):
         self.input_path = INPUT_DATA_PATH
-        print(self.input_path)
+        # print(self.input_path)
         self.x = None
         self.sift_keypoints = None
         self.kmeans = None
         self.feature_vectors = None
 
     def sift_implmentation(self, file):
-        print("reading file: " + file)
+        # print("reading file: " + file)
         image = cv2.imread(self.input_path + '/' + file, 1)
         # Convert them to grayscale
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -34,7 +34,7 @@ class SIFT:
         pool.map(self.sift_implmentation, os.listdir(self.input_path))
         pool.close()
         pool.join()
-        print(self.sift_keypoints)
+        # print(self.sift_keypoints)
         # keypoints = np.asarray(self.sift_keypoints, dtype=np.float32)
         if self.sift_keypoints:
             keypoints = np.concatenate(self.sift_keypoints, axis=0)
@@ -43,7 +43,7 @@ class SIFT:
             self.kmeans = MiniBatchKMeans(n_clusters=num_cluster, random_state=0).fit(keypoints)
 
     def calculate_centroids_histogram_implemtation(self, file):
-        print("reading file in calculate_centroids_histogram_implemtation: " + file)
+        # print("reading file in calculate_centroids_histogram_implemtation: " + file)
         image = cv2.imread(self.input_path + '/' + file, 1)
         # Convert them to grayscale
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

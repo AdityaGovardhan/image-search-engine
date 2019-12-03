@@ -24,9 +24,9 @@ class DataPreProcessor:
 
         self.DATABASE_IMAGES_PATH = self.root_path + "/images"
         self.CLASSIFICATION_IMAGES_PATH = self.root_path + "/phase3_sample_data"
-
         feature_models = []
         feature_models.append("histogram_of_gradients")
+        feature_models.append("sift")
         # feature_models.append("histogram_of_gradients_30")
 
         processes = []
@@ -46,11 +46,9 @@ class DataPreProcessor:
         for chara_ in charas:
             for set_ in sets:
                 path = self.CLASSIFICATION_IMAGES_PATH + "/" + chara_ + "/" + set_
-
                 feature_models = []
-
                 feature_models.append("histogram_of_gradients" + "_" + chara_ + "_" + set_)
-                feature_models.append("local_binary_pattern" + "_" + chara_ + "_" + set_)
+                # feature_models.append("local_binary_pattern" + "_" + chara_ + "_" + set_)
                 feature_models.append("sift" + "_" + chara_ + "_" + set_)
 
                 processes = []
@@ -127,8 +125,13 @@ class DataPreProcessor:
             connection.commit()
 
     def perform_feature_model(self, feature):
-        histogram_of_gradients = HistogramOfGradients(self.DATABASE_IMAGES_PATH)
-        feature_vectors = histogram_of_gradients.get_image_vectors()
+        if feature == 'sift':
+            sift = SIFT(self.DATABASE_IMAGES_PATH)
+            sift.read_and_clusterize(num_cluster=150)
+            feature_vectors = sift.calculate_centroids_histogram()
+        else:
+            histogram_of_gradients = HistogramOfGradients(self.DATABASE_IMAGES_PATH)
+            feature_vectors = histogram_of_gradients.get_image_vectors()
 
         self.database_connection.create_feature_model_table(feature)
         self.database_connection.insert_feature_data(feature, feature_vectors)
@@ -143,7 +146,7 @@ class DataPreProcessor:
             feature_vectors = local_binary_pattern.get_image_vectors()
         elif "sift" in feature:
             sift = SIFT(path)
-            sift.read_and_clusterize(150)
+            sift.read_and_clusterize(num_cluster=200)
             feature_vectors = sift.calculate_centroids_histogram()
         self.database_connection.insert_feature_data(feature, feature_vectors)
 

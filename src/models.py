@@ -23,6 +23,12 @@ datasets = (
         ('set4', 'set4'),
     )
 
+kernels = (
+    ('linear', 'linear'),
+    ('poly', 'poly'),
+    ('rbf', 'rbf'),
+    ('gaussian', 'gaussian'),
+    )
 
 class Task1Model(models.Model):
     number_of_latent_semantics = models.CharField(max_length=3, verbose_name="Number of Latent Semantics")
@@ -45,6 +51,7 @@ class Task3Model(models.Model):
 class Task4Model(models.Model):
     classifier = models.CharField(max_length=6, choices=classifiers, default='Support Vector Machine')
     dataset = models.CharField(max_length=6, choices=datasets, default='set1')
+    kernel = models.CharField(max_length=6, choices=kernels, default='linear')
     labelled_folder_name = models.CharField(max_length=100, verbose_name="Labelled Folder Path")
     unlabelled_folder_name = models.CharField(max_length=100, verbose_name="Unlabelled Folder Path")
 

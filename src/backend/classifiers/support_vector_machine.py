@@ -17,7 +17,6 @@ class SupportVectorMachine(object):
         self.y = None
 
     def fit(self, X, y):
-
         self.X = X
         self.y = y
         self.number_of_samples, number_of_features = np.shape(X)
@@ -82,19 +81,3 @@ class SupportVectorMachine(object):
             distance = np.linalg.norm(x - y) ** 2
             div = 1 / (2 * sigma ** 2)
             return np.exp(- div * distance)
-
-    def plot(self):
-        x_min = min(self.X[:, 0]) - 0.5
-        x_max = max(self.X[:, 0]) + 0.5
-        y_min = min(self.X[:, 1]) - 0.5
-        y_max = max(self.X[:, 1]) + 0.5
-        step = 0.02
-        xx, yy = np.meshgrid(np.arange(x_min, x_max, step), np.arange(y_min, y_max, step))
-        d = np.concatenate((xx.ravel().reshape(-1, 1), yy.ravel().reshape(-1, 1)), axis=1)
-        Z = self.b + np.sum(self.alphas.reshape((self.number_of_samples, 1)) * self.y.reshape(
-            (self.number_of_samples, 1)) * self.kernels(self.kernel_name, self.X, d), axis=0)
-        Z = Z.reshape(xx.shape)
-        fig, ax = plt.subplots()
-        sns.scatterplot(x=self.X[:, 0], y=self.X[:, 1], hue=self.y, ax=ax)
-        ax.contour(xx, yy, Z, levels=[-1, 0, 1])
-        plt.show()

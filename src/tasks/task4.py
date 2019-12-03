@@ -10,7 +10,7 @@ import time
 
 class Task4(CreateView):
     model = models.Task4Model
-    fields = ('classifier', 'dataset', 'labelled_folder_name', 'unlabelled_folder_name',)
+    fields = ('classifier', 'dataset', 'kernel', 'labelled_folder_name', 'unlabelled_folder_name',)
     template_name = 'task4.html'
 
     def get_context_data(self, **kwargs):
@@ -23,6 +23,7 @@ def execute_task4(request):
     labelled_folder_path = request.POST.get("labelled_folder_name")
     unlabelled_folder_path = request.POST.get("unlabelled_folder_name")
     dataset = request.POST.get("dataset")
+    kernel = request.POST.get("kernel")
     classifier = request.POST.get("classifier")
 
     images_with_labels = [()]
@@ -41,7 +42,7 @@ def execute_task4(request):
                                                          "from_task": "task4", "accuracy": accuracy,
                                                          "classifier": classifier})
     else:
-        classifier_caller = ClassifierCaller(classifier, dataset, dataset)
+        classifier_caller = ClassifierCaller(classifier, dataset, dataset, kernel)
         classifier_caller.call_classifier()
         time.sleep(4)
         result, images_with_labels = classifier_caller.get_result()
