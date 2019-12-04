@@ -7,7 +7,8 @@ import backend.utils as utils
 
 
 class ClassifierCaller:
-    def __init__(self, classifier_name, training_dataset, testing_dataset, kernel, dimensionality_algo="svd"):
+    def __init__(self, classifier_name, training_dataset, testing_dataset, kernel, number_of_clusters,
+                 dimensionality_algo="svd"):
         self.classifier_name = classifier_name
         self.training_dataset = training_dataset
         self.testing_dataset = testing_dataset
@@ -15,6 +16,7 @@ class ClassifierCaller:
         self.result = None
         self.algo = dimensionality_algo
         self.kernel = kernel
+        self.number_of_clusters = number_of_clusters
 
     def call_classifier(self):
         if self.classifier_name == "Support Vector Machine":
@@ -28,9 +30,9 @@ class ClassifierCaller:
             self.algo = "sift"
 
         if self.algo == "sift":
-            train_table = 'sift_labelled_' + self.training_dataset.lower()
+            train_table = 'sift_labelled_' + self.training_dataset.lower() + '_' + self.number_of_clusters
             train_table_metadata = 'metadata_labelled_' + self.training_dataset.lower()
-            test_table = 'sift_unlabelled_' + self.testing_dataset.lower()
+            test_table = 'sift_unlabelled_' + self.testing_dataset.lower() + '_' + self.number_of_clusters
 
             train_df, self.test_df = utils.get_train_and_test_dataframes_from_db(train_table, train_table_metadata,
                                                                                  test_table, algo=self.algo)
@@ -59,13 +61,13 @@ class ClassifierCaller:
         self.test_df['predicted_label'] = classifier.predict(
             np.vstack(self.test_df['hog_svd_descriptor'].values))
 
-        clf = SVC(kernel='linear')
-        clf.fit(X_train, y_train)
-        x = clf.predict(np.vstack(self.test_df['hog_svd_descriptor'].values))
-        result = utils.get_result_metrics("self.classifier_name", self.test_df['expected_label'],
-                                          x)
-        print("results---------------------------------------&&&&&&&&&&&&&")
-        print(result)
+        # clf = SVC(kernel='linear')
+        # clf.fit(X_train, y_train)
+        # x = clf.predict(np.vstack(self.test_df['hog_svd_descriptor'].values))
+        # result = utils.get_result_metrics("self.classifier_name", self.test_df['expected_label'],
+        #                                   x)
+        # print("results---------------------------------------&&&&&&&&&&&&&")
+        # print(result)
 
     def get_result(self):
         self.result = utils.get_result_metrics(self.classifier_name, self.test_df['expected_label'],

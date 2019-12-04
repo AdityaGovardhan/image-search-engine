@@ -5,7 +5,7 @@ from django.forms import ModelForm
 class Task1Form(ModelForm):
     class Meta:
         model = models.Task1Model
-        fields = ['number_of_latent_semantics']
+        fields = ['number_of_latent_semantics', 'dataset']
 
 
 
@@ -24,7 +24,7 @@ class Task3Form(ModelForm):
 class Task4Form(ModelForm):
     class Meta:
         model = models.Task4Model
-        fields = ['classifier', 'dataset', 'kernel']
+        fields = ['classifier', 'dataset', 'kernel', 'number_of_clusters']
 
 
 class Task5Form(ModelForm):

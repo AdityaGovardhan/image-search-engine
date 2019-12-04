@@ -30,10 +30,16 @@ kernels = (
     ('gaussian', 'gaussian'),
     )
 
+number_of_total_clusters = (
+    ('200', '200'),
+    ('250', '250'),
+    ('300', '300'),
+    )
+
+
 class Task1Model(models.Model):
     number_of_latent_semantics = models.CharField(max_length=3, verbose_name="Number of Latent Semantics")
-    labelled_folder_name = models.CharField(max_length=100, verbose_name="Labelled Folder Path")
-    unlabelled_folder_name = models.CharField(max_length=100, verbose_name="Unlabelled Folder Path")
+    dataset = models.CharField(max_length=6, choices=datasets, default='set1')
 
 
 class Task2Model(models.Model):
@@ -51,6 +57,7 @@ class Task3Model(models.Model):
 class Task4Model(models.Model):
     classifier = models.CharField(max_length=6, choices=classifiers, default='Support Vector Machine')
     dataset = models.CharField(max_length=6, choices=datasets, default='set1')
+    number_of_clusters = models.CharField(max_length=6, choices=number_of_total_clusters, default='200')
     kernel = models.CharField(max_length=6, choices=kernels, default='linear')
     labelled_folder_name = models.CharField(max_length=100, verbose_name="Labelled Folder Path")
     unlabelled_folder_name = models.CharField(max_length=100, verbose_name="Unlabelled Folder Path")
@@ -59,10 +66,10 @@ class Task4Model(models.Model):
 class Task5Model(models.Model):
     number_of_layers = models.CharField(max_length=2)
     number_of_hashes_per_layer = models.CharField(max_length=2)
-    set_of_vectors = models.CharField(max_length=2)
     query_image = models.CharField(max_length=100)
     most_similar_images = models.CharField(max_length=2, verbose_name = "Number of Most Similar Images")
     relevance_feedback = models.CharField(max_length=6, choices=task_6_relevance_feedbacks, default='None')
+
 
 class Task6Model(models.Model):
     relevance_feedback = models.CharField(max_length=6, choices=task_6_relevance_feedbacks, default='Probabilistic')

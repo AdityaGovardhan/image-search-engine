@@ -9,7 +9,7 @@ from utils import save_to_pickle,read_from_pickle
 
 class Task5(CreateView):
     model = models.Task5Model
-    fields = ('number_of_layers', 'number_of_hashes_per_layer', 'set_of_vectors', 'query_image', 'most_similar_images',
+    fields = ('number_of_layers', 'number_of_hashes_per_layer', 'query_image', 'most_similar_images',
               'relevance_feedback')
     template_name = 'task5.html'
 

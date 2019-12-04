@@ -1,4 +1,5 @@
 import sys
+
 sys.path.insert(0, 'src')
 
 from django.shortcuts import render
@@ -9,9 +10,10 @@ import pprint
 from django.http import HttpResponse
 import json
 
+
 class Task1(CreateView):
     model = models.Task1Model
-    fields = ('number_of_latent_semantics', 'labelled_folder_name','unlabelled_folder_name',)
+    fields = ('number_of_latent_semantics', 'dataset',)
     template_name = 'task1.html'
 
     def get_context_data(self, **kwargs):
@@ -20,17 +22,12 @@ class Task1(CreateView):
         return context
 
 
-
 def execute_task1(request):
-
     k = int(request.POST.get("number_of_latent_semantics"))
-    labelled_folder_path = request.POST.get("labelled_folder_name")
-    unlabelled_folder_path = request.POST.get("unlabelled_folder_name")
-    if (labelled_folder_path[0] != '/'):
-        labelled_folder_path = "/" + labelled_folder_path
-    if (unlabelled_folder_path[0] != '/'):
-        unlabelled_folder_path = "/" + unlabelled_folder_path
+    dataset = request.POST.get("dataset")
 
+    labelled_folder_path = "/Labelled/" + dataset
+    unlabelled_folder_path = "/Unlabelled/" + dataset
     task1_classifier_obj = Task1_Classifier()
     prediction = task1_classifier_obj.get_label_for_folder(labelled_folder_path, unlabelled_folder_path, k)
 
