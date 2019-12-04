@@ -17,7 +17,6 @@ from backend.pageRank import PageRank
 
 
 class RelevanceFeedback:
-
     def __init__(self):
         self.database_connection = DatabaseConnection()
         self.conn = self.database_connection.get_db_connection()
@@ -98,21 +97,21 @@ class RelevanceFeedback:
 
     def get_DTC_based_feedback(self, q, rel_items, irl_items, obj_feature_matrix, m):
         q_new=self.compute_new_query_vector(q_old=q,relevant_items=rel_items,irrel_items=irl_items)
-		X_train,Y_train=self.create_X_Y_as_np_matrix(rel_items=rel_items,irl_items=irl_items)
-		
-		#Training SVM classifier
-		dtl = decision_tree_learning.DecisionTreeLearning()
-		dtl.fit(X=X_train,y=Y_train)
+        X_train,Y_train=self.create_X_Y_as_np_matrix(rel_items=rel_items,irl_items=irl_items)
 
-		# Now getting more test data from LSH indexes
-		test_dataset=read_from_pickle('test_dataset.pickle')
-		X_test,imageNames=self.create_X_test_as_np_matrix(test_dataset=test_dataset)
-		Y_pred = dtl.predict(u=X_test)
-		relevant_pred_img_names=[imageNames[i] for i in range(0,len(Y_pred)) if Y_pred[i]==1]
-		new_obj_feature_matrix= self.database_connection.HOG_descriptor_from_image_ids(image_ids=relevant_pred_img_names)
+        #Training SVM classifier
+        dtl = decision_tree_learning.DecisionTreeLearning()
+        dtl.fit(X=X_train,y=Y_train)
 
-		new_rank_list=get_most_m_similar_images(data_with_images=new_obj_feature_matrix,query_image_feature_vector=q_new,m=m)
-		return new_rank_list
+        # Now getting more test data from LSH indexes
+        test_dataset=read_from_pickle('test_dataset.pickle')
+        X_test,imageNames=self.create_X_test_as_np_matrix(test_dataset=test_dataset)
+        Y_pred = dtl.predict(u=X_test)
+        relevant_pred_img_names=[imageNames[i] for i in range(0,len(Y_pred)) if Y_pred[i]==1]
+        new_obj_feature_matrix= self.database_connection.HOG_descriptor_from_image_ids(image_ids=relevant_pred_img_names)
+
+        new_rank_list=get_most_m_similar_images(data_with_images=new_obj_feature_matrix,query_image_feature_vector=q_new,m=m)
+        return new_rank_list
 
     def get_PPR_based_feedback(self, q, rel_items, irl_items, obj_feature_matrix, m):
         q_new = self.compute_new_query_vector(q_old=q, relevant_items=rel_items, irrel_items=irl_items)
@@ -248,7 +247,6 @@ class RelevanceFeedback:
             imageNames.append(item[0])
 
         return np.array(X), imageNames
-
 
 if __name__ == '__main__':
     rf = RelevanceFeedback()

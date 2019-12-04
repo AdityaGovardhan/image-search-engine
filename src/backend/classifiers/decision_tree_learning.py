@@ -139,16 +139,23 @@ class DecisionTreeLearning:
         print(y)
         return y
 
-    def predict(self, tree, X):
+    def predict_helper(self, tree, u):
         if tree.dominant_label:
             return tree.dominant_label
-        image_value_for_tag = X[tree.feature_index]
+        image_value_for_tag = u[tree.feature_index]
         if image_value_for_tag > tree.mean_value:
-            return self.predict(tree.right, X)
+            return self.predict_helper(tree.right, u)
         else:
-            return self.predict(tree.left, X)
+            return self.predict_helper(tree.left, u)
 
-    def fit(self, X, y, X_test):
+    def predict(self, u):
+        predicted_labels = list()
+        for u_i in u:
+            predicted_labels.append(self.predict_helper(self.tree, u_i))
+
+        return predicted_labels
+
+    def fit(self, X, y):
         tempid_to_image_vector = dict()
         for i, vector in enumerate(X): 
             tempid_to_image_vector[i] = vector
@@ -158,12 +165,6 @@ class DecisionTreeLearning:
         node = Node(tempid_to_image_vector, tempid_to_image_label)
         
         self.tree = node.construct_tree()
-
-        predicted_labels = list()
-        for X_test_i in X_test:
-            predicted_labels.append(self.predict(self.tree, X_test_i))
-
-        return predicted_labels
 
 # testing
 if __name__ == "__main__":
@@ -180,8 +181,9 @@ if __name__ == "__main__":
     # dtl.fit_sklearn(X_train, y_train)
     # test_df['predicted_label'] = dtl.predict_sklearn(np.vstack(test_df['hog_svd_descriptor'].values))
 
-    dtl2 = DecisionTreeLearning()
-    test_df['predicted_label'] = dtl2.fit(X_train, y_train, np.vstack(test_df['hog_svd_descriptor'].values))
+    dtl = DecisionTreeLearning()
+    dtl.fit(X_train, y_train)
+    test_df['predicted_label'] = dtl.predict(np.vstack(test_df['hog_svd_descriptor'].values))
 
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):
         print(test_df.sort_values('imagename'))
