@@ -13,7 +13,7 @@ import json
 
 class Task1(CreateView):
     model = models.Task1Model
-    fields = ('number_of_latent_semantics', 'dataset',)
+    fields = ('number_of_latent_semantics','labelled_dataset','Unlabelled_dataset',)
     template_name = 'task1.html'
 
     def get_context_data(self, **kwargs):
@@ -24,10 +24,11 @@ class Task1(CreateView):
 
 def execute_task1(request):
     k = int(request.POST.get("number_of_latent_semantics"))
-    dataset = request.POST.get("dataset")
+    dataset1 = request.POST.get("labelled_dataset")
+    dataset2 = request.POST.get("Unlabelled_dataset")
 
-    labelled_folder_path = "/Labelled/" + dataset
-    unlabelled_folder_path = "/Unlabelled/" + dataset
+    labelled_folder_path = "/Labelled/" + dataset1
+    unlabelled_folder_path = "/Unlabelled/" + dataset2
     task1_classifier_obj = Task1_Classifier()
     prediction = task1_classifier_obj.get_label_for_folder(labelled_folder_path, unlabelled_folder_path, k)
 
