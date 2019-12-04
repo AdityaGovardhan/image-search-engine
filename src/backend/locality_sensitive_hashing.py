@@ -13,6 +13,7 @@ class LSH:
         self.final_grouped={}
         self.query_image_bin_reprsnt={}
         self.num_of_reduced_times=0
+        self.resultset={'unique':None,'total':None}
 
     # Create image representation for each image per layer 
     def generate_data_representation(self,layer,data_points=[],image_names=[]):
@@ -63,8 +64,11 @@ class LSH:
     def process_query_image(self,image_vector):
         final_grouped = self.generate_groupby_binary(self.all_layers_representation)
         similar_images = self.find_similar_images(image_vector)
+        # set unique and total number of images retrieved
+        self.resultset['total'] = len(similar_images)
         list_set = set(similar_images)
         similar_images = (list(list_set))
+        self.resultset['unique'] = len(similar_images)
         return similar_images
 
     # Finds all similar images from all layers
@@ -82,14 +86,18 @@ class LSH:
     def find_ksimilar_images(self,k,image_vector,all_image_hog_features):
         similar_images = self.process_query_image(image_vector)
         while(k > len(similar_images) and self.num_of_reduced_times < self.num_hash_functions - 1):
-            similar_images.extend(self.get_images_by_reducing_representation())
+            all_result_images = self.get_images_by_reducing_representation()
+            similar_images.extend(all_result_images)
             list_set = set(similar_images)
+            self.resultset['total'] = len(similar_images)
             similar_images = (list(list_set))
+            self.resultset['unique'] = len(similar_images)
         
         # need to implement euclidean distance comparision
         # not neccessarily should happen here
-        return self.get_sorted_k_values(num_similar_images=k,similar_images=similar_images,all_image_hog_features=all_image_hog_features,
+        final_similar_images = self.get_sorted_k_values(num_similar_images=k,similar_images=similar_images,all_image_hog_features=all_image_hog_features,
                                         image_vector=image_vector)
+        return (final_similar_images,self.resultset)
             
     # Finds similar images by reducing representation 
     def get_images_by_reducing_representation(self):
@@ -116,6 +124,8 @@ class LSH:
 
     def get_sorted_k_values(self,num_similar_images,similar_images,all_image_hog_features,image_vector):
         similar_images_vectors = []
+        print("num_similar_images",num_similar_images)
+        print("similar_images",len(similar_images))
         if(num_similar_images <= len(similar_images)):
             for i in similar_images:
                 index = all_image_hog_features['images'].index(i)

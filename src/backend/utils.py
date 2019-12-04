@@ -87,8 +87,7 @@ def convert_folder_path_to_table_name(folder_name, pre_string="metadata"):
         table_name = pre_string + "_" + folder_name
     return table_name
 
-
-def get_most_m_similar_images(data_with_images, query_image_feature_vector, Vt, m):
+def get_most_m_similar_images(data_with_images, query_image_feature_vector, m):
     """
     Author: Vibhu Varshney
     This funcion computes the similarity score between the query image vector and the images in the database
@@ -100,8 +99,10 @@ def get_most_m_similar_images(data_with_images, query_image_feature_vector, Vt, 
     """
     db_data_matrix = data_with_images.get('data_matrix')
     imageNames = data_with_images.get('images')
-    database_images_latent_vectors = np.dot(db_data_matrix, np.transpose(Vt))
-    query_image_latent_vector = np.dot(np.array(query_image_feature_vector), Vt.T)
+    database_images_latent_vectors = db_data_matrix
+    # database_images_latent_vectors = np.dot(db_data_matrix, np.transpose(Vt))
+    query_image_latent_vector = query_image_feature_vector
+    # query_image_latent_vector = np.dot(np.array(query_image_feature_vector),Vt.T)
     return get_top_m_tuples_by_similarity_score(database_images_latent_vectors,
                                                 query_image_latent_vector, imageNames,
                                                 m + 1)  # +1 because the db contains the query image also
@@ -152,11 +153,14 @@ def save_to_pickle(object_to_save, file_name):
 
 
 def read_from_pickle(file_name):
-    pickle_directory = get_pickle_directory()
-    with open(os.path.join(pickle_directory, file_name), 'rb') as f:
-        data = pickle.load(f)
-    f.close()
-    return data
+    try:
+        pickle_directory = get_pickle_directory()
+        with open(os.path.join(pickle_directory,file_name), 'rb') as f:
+            data = pickle.load(f)
+        f.close()
+        return data
+    except Exception:
+        return None
 
 
 def get_image_names_in_a_folder(relative_folder_path):

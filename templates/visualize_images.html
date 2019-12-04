@@ -26,8 +26,9 @@
 </style>
 
 <body>
+    
     {% block result %}
-
+    <div id="load" style="display:none"><img src="/static/ajax-loading-icon.jpg"/></div>
         <div class="heading">
             {% if from_task == "task4" %}
                 <p> Classifier = {{ classifier }}</p>
@@ -36,6 +37,8 @@
 
             {% if from_task == "task5" %}
                 <p> Relevance Feedback = {{ rel_type }} </p>
+                <p> Total number of images considered : {{num_total}}</p>
+                <p> Unique number of images considered : {{num_unique}}</p>
             {% endif %}
         </div>
 

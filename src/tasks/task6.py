@@ -60,13 +60,16 @@ def process_feedback(request):
     m = int(request.POST.get("t"))
 
     q_name=json.loads(request.POST.get("q"))
-    obj_feature_matrix = rf.database_connection.get_object_feature_matrix_from_db('histogram_of_gradients')
+    # obj_feature_matrix = rf.database_connection.get_object_feature_matrix_from_db('histogram_of_gradients')
+    obj_similar_thousand_names = read_from_pickle('test_dataset.pickle')
+    obj_similar_thousand_names=[x[0] for x in obj_similar_thousand_names]
+    obj_feature_matrix = rf.database_connection.HOG_descriptor_from_image_ids(image_ids = obj_similar_thousand_names)
     data_matrix = obj_feature_matrix['data_matrix']
     new_rank_list=[]
     relevant=json.loads(relevant)
     irrelevant=json.loads(irrelevant)
     q=rf.database_connection.get_feature_data_for_image('histogram_of_gradients',q_name)
-    Vt=rf.get_Vt(obj_feature_matrix=obj_feature_matrix)
+    # Vt=rf.get_Vt(obj_feature_matrix=obj_feature_matrix)
 
     if rel_type == 'Probabilistic':
         n_i = rf.calculate_n_i(D_matrix=data_matrix)
@@ -76,13 +79,14 @@ def process_feedback(request):
         new_rank_list = new_rank_list[:m]
     
     elif rel_type == 'Support Vector Machine':
-        new_rank_list=rf.get_SVM_based_feedback(q=q,Vt=Vt,rel_items=relevant,irl_items=irrelevant,obj_feature_matrix=obj_feature_matrix,m=m)
+        new_rank_list=rf.get_SVM_based_feedback(q=q,rel_items=relevant,irl_items=irrelevant,obj_feature_matrix=obj_feature_matrix,m=m)
+        # new_rank_list=rf.get_SVM_based_feedback(q=q,Vt=Vt,rel_items=relevant,irl_items=irrelevant,obj_feature_matrix=obj_feature_matrix,m=m)
 
     elif rel_type == 'Decision Tree Classifier':
-        new_rank_list=rf.get_DTC_based_feedback(q=q,Vt=Vt,rel_items=relevant,irl_items=irrelevant,obj_feature_matrix=obj_feature_matrix,m=m)
+        new_rank_list=rf.get_DTC_based_feedback(q=q,rel_items=relevant,irl_items=irrelevant,obj_feature_matrix=obj_feature_matrix,m=m)
 
     elif rel_type == 'Personalized Page Rank':
-        new_rank_list=rf.get_PPR_based_feedback(q=q,Vt=Vt,rel_items=relevant,irl_items=irrelevant,obj_feature_matrix=obj_feature_matrix,m=m)
+        new_rank_list=rf.get_PPR_based_feedback(q=q,rel_items=relevant,irl_items=irrelevant,obj_feature_matrix=obj_feature_matrix,m=m)
     else:
         new_rank_list.append(('Please select a relevance feedback type and start again from task 5','0'))
 

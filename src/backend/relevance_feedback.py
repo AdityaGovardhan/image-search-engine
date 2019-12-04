@@ -75,7 +75,7 @@ class RelevanceFeedback:
 
 		return rel_items,irl_items
 
-	def get_SVM_based_feedback(self,q,Vt,rel_items,irl_items,obj_feature_matrix,m):
+	def get_SVM_based_feedback(self,q,rel_items,irl_items,obj_feature_matrix,m):
 		q_new=self.compute_new_query_vector(q_old=q,relevant_items=rel_items,irrel_items=irl_items)
 		X_train,Y_train=self.create_X_Y_as_np_matrix(rel_items=rel_items,irl_items=irl_items)
 		
@@ -90,10 +90,10 @@ class RelevanceFeedback:
 		relevant_pred_img_names=[imageNames[i] for i in range(0,len(Y_pred)) if Y_pred[i]==1]
 		new_obj_feature_matrix= self.database_connection.HOG_descriptor_from_image_ids(image_ids=relevant_pred_img_names)
 
-		new_rank_list=get_most_m_similar_images(data_with_images=new_obj_feature_matrix,query_image_feature_vector=q_new,Vt=Vt,m=m)
+		new_rank_list=get_most_m_similar_images(data_with_images=new_obj_feature_matrix,query_image_feature_vector=q_new,m=m)
 		return new_rank_list
 
-	def get_DTC_based_feedback(self,q,Vt,rel_items,irl_items,obj_feature_matrix,m):
+	def get_DTC_based_feedback(self,q,rel_items,irl_items,obj_feature_matrix,m):
 		q_new=self.compute_new_query_vector(q_old=q,relevant_items=rel_items,irrel_items=irl_items)
 		"""
 		After computing q_new, now we will train an SVM classifier on the basis of rel_items and irl_items
@@ -117,11 +117,11 @@ class RelevanceFeedback:
 		Now u are good to continue below
 		Same thing can be done for DTC and PPR
 		"""
-		new_rank_list=get_most_m_similar_images(data_with_images=obj_feature_matrix,query_image_feature_vector=q_new,Vt=Vt,m=m)
+		new_rank_list=get_most_m_similar_images(data_with_images=obj_feature_matrix,query_image_feature_vector=q_new,m=m)
 		return new_rank_list
 
-	def get_PPR_based_feedback(self,q,Vt,rel_items,irl_items,obj_feature_matrix,m):
-
+	def get_PPR_based_feedback(self,q,rel_items,irl_items,obj_feature_matrix,m):
+		q_new=self.compute_new_query_vector(q_old=q,relevant_items=rel_items,irrel_items=irl_items)
 		topology_images = read_from_pickle('test_dataset.pickle')
 		image_names = get_image_names_from_tuples(topology_images)
 		db_conn = DatabaseConnection()
@@ -236,9 +236,9 @@ class RelevanceFeedback:
 		for item in irl_items:
 			fv=self.database_connection.get_feature_data_for_image('histogram_of_gradients',item)
 			X.append(fv.reshape(fv.shape[1]))
-			Y.append(0)	
+			Y.append(-1)	
 
-		return X,Y
+		return np.array(X),np.array(Y)
 	
 	def create_X_test_as_np_matrix(self,test_dataset):
 		X=[]
@@ -249,7 +249,7 @@ class RelevanceFeedback:
 			X.append(fv.reshape(fv.shape[1]))
 			imageNames.append(item[0])
 
-		return X,imageNames
+		return np.array(X),imageNames
 
 if __name__ == '__main__':
 	rf=RelevanceFeedback()

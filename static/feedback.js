@@ -49,12 +49,19 @@ $( document ).ready(function() {
 
             success: function(data){
                 var result = $('<div />').append(data).find('#showResults').html();
-                $('#showResults').html(result);
+                $('#showResults').html(result).show();
+                $('.heading').show();
+                $('#load').css('display','none');
                 relevant = [];
                 irrelevant = [];
             },
+            beforeSend:function(){
+                $('#load').css('display','block');
+                $('.heading,#showResults').hide();
+            },
             error: function (err_msg) {
-                console.log("error ", err_msg)
+                console.log("error ", err_msg);
+                $('#load').hide();
             }
         });
 

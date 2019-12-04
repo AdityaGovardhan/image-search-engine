@@ -4,7 +4,7 @@ from src import models
 from locality_sensitive_hashing import LSH
 from database_connection import DatabaseConnection
 import numpy as np
-from utils import save_to_pickle
+from utils import save_to_pickle,read_from_pickle
 
 
 class Task5(CreateView):
@@ -27,20 +27,24 @@ def execute_task5(request):
     rel_type = request.POST.get('relevance_feedback')
     lsh = LSH(k=k, l=l)
     dbconnection = DatabaseConnection()
-    all_image_hog_features = dbconnection.get_object_feature_matrix_from_db(tablename='histogram_of_gradients')
-    bit_map = lsh.generate_representation_for_all_layers(all_image_hog_features['data_matrix'],
-                                                         all_image_hog_features['images'])
-    image_vector = dbconnection.get_feature_data_for_image('histogram_of_gradients', query_image)
+
+    if(read_from_pickle('all_img_features_LSH.pickle')!=None):
+        all_image_hog_features = read_from_pickle('all_img_features_LSH.pickle')
+    else:
+        all_image_hog_features = dbconnection.get_object_feature_matrix_from_db(tablename='histogram_of_gradients')
+        save_to_pickle(all_image_hog_features,'all_img_features_LSH.pickle')
+    
+    bit_map = lsh.generate_representation_for_all_layers(all_image_hog_features['data_matrix'],all_image_hog_features['images'])
+    image_vector = dbconnection.get_feature_data_for_image('histogram_of_gradients',query_image)
     image_vector = np.asarray(image_vector.flatten())
+    
+    (sorted_k_values,result_stats) = lsh.find_ksimilar_images(k=t,image_vector=image_vector,all_image_hog_features=all_image_hog_features)
+        
+    #Now getting a bigger test dataset for relevance feedback
+    (test_dataset,result_stats)= lsh.find_ksimilar_images(k=1000+t,image_vector=image_vector,all_image_hog_features=all_image_hog_features)
 
-    sorted_k_values = lsh.find_ksimilar_images(k=t, image_vector=image_vector,
-                                               all_image_hog_features=all_image_hog_features)
-
-    # Now getting a bigger test dataset for relevance feedback
-    test_dataset = lsh.find_ksimilar_images(k=30, image_vector=image_vector,
-                                            all_image_hog_features=all_image_hog_features)
 
     save_to_pickle(test_dataset, 'test_dataset.pickle')
+    print(sorted_k_values[:t])
+    return render(request, 'visualize_images.html', {'images': sorted_k_values[:t], "from_task": "task5",'rel_type':rel_type, "q":query_image, "t":t,"num_total":result_stats['total'],"num_unique":result_stats['unique']})
 
-    return render(request, 'visualize_images.html',
-                  {'images': sorted_k_values[:t], "from_task": "task5", 'rel_type': rel_type, "q": query_image, "t": t})
