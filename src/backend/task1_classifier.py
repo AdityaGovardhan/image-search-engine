@@ -68,7 +68,23 @@ class Task1_Classifier:
 
         predicted_labels = self.classify_images_folder(query_image_names, query_data_matrix, dorsal_semantics, palmar_semantics)
 
+        query_list_of_labels = self.db_conn.get_correct_labels_for_given_images(query_image_names, "aspectofhand",
+                                                                                "metadata")
+
         prediction = sorted(predicted_labels, key=lambda k: k[0])
+
+        query_list_of_labels = sorted(query_list_of_labels, key=lambda k: k[0])
+
+        accuracy = 0.0
+        for (image_name, predicted_label), (image2, correct_label) in zip(prediction, query_list_of_labels):
+            # print(image_name, predicted_label,image2, correct_label)
+            correct_label = correct_label.split(' ')[0]
+            if (image_name == image2 and correct_label == predicted_label):
+                accuracy += 1
+
+        accuracy = 100 * accuracy / float(len(query_image_names))
+        print("The accuracy is " + str(accuracy))
+
         print(prediction)
         return prediction
 
