@@ -9,7 +9,7 @@ import os, sys, inspect
 import singular_value_decomposition
 from database_connection import DatabaseConnection
 from utils import get_most_m_similar_images, get_image_names_from_tuples
-from classifiers import support_vector_machine
+from classifiers import support_vector_machine, decision_tree_learning
 from locality_sensitive_hashing import LSH
 from utils import read_from_pickle
 from singular_value_decomposition import SingularValueDecomposition
@@ -97,32 +97,22 @@ class RelevanceFeedback:
         return new_rank_list
 
     def get_DTC_based_feedback(self, q, rel_items, irl_items, obj_feature_matrix, m):
-        q_new = self.compute_new_query_vector(q_old=q, relevant_items=rel_items, irrel_items=irl_items)
-        """
-        After computing q_new, now we will train an SVM classifier on the basis of rel_items and irl_items
-        After training the SVM classifier we test it on a superset of data from LSH (possibly 1000+t)
-        We create an obj_feature_matrix on the basis of predicted relevant items from the classifier
-        We pass this to the get_most_m_similar_images() function
+        q_new=self.compute_new_query_vector(q_old=q,relevant_items=rel_items,irrel_items=irl_items)
+		X_train,Y_train=self.create_X_Y_as_np_matrix(rel_items=rel_items,irl_items=irl_items)
+		
+		#Training SVM classifier
+		dtl = decision_tree_learning.DecisionTreeLearning()
+		dtl.fit(X=X_train,y=Y_train)
 
-        Potenial Lines of code from this point onwards:
-        svm=SupportVectorMachine()
-        lsh=LSH()
-        X_train=[append getFeatureVecsfromDB(rel_items)]
-        Y_train=[append 1 for rel_items]
-        X_train=[append getFeatureVecsfromDB(irl_items)]
-        Y_train=[append 0 for irl_items]
-        svm.fit(X_train,Y_train)
-        similar_images = lsh.find_ksimilar_images(1000+t,image_vector)
-        X_test= getFeatureVecsfromDB(similar_images)
-        Y_test= svm.predict(X_test)
-        rel=[X_test[i] for i in range(0,len(Y_test)) where Y_test[i]==1]
-        obj_feature_matrix_new= create_obj_feat_matrix()
-        Now u are good to continue below
-        Same thing can be done for DTC and PPR
-        """
-        new_rank_list = get_most_m_similar_images(data_with_images=obj_feature_matrix, query_image_feature_vector=q_new,
-                                                  m=m)
-        return new_rank_list
+		# Now getting more test data from LSH indexes
+		test_dataset=read_from_pickle('test_dataset.pickle')
+		X_test,imageNames=self.create_X_test_as_np_matrix(test_dataset=test_dataset)
+		Y_pred = dtl.predict(u=X_test)
+		relevant_pred_img_names=[imageNames[i] for i in range(0,len(Y_pred)) if Y_pred[i]==1]
+		new_obj_feature_matrix= self.database_connection.HOG_descriptor_from_image_ids(image_ids=relevant_pred_img_names)
+
+		new_rank_list=get_most_m_similar_images(data_with_images=new_obj_feature_matrix,query_image_feature_vector=q_new,m=m)
+		return new_rank_list
 
     def get_PPR_based_feedback(self, q, rel_items, irl_items, obj_feature_matrix, m):
         q_new = self.compute_new_query_vector(q_old=q, relevant_items=rel_items, irrel_items=irl_items)

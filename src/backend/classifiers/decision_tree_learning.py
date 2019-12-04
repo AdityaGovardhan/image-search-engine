@@ -10,7 +10,6 @@ from numpy.linalg import svd
 import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import plot_tree
 import pprint
 import operator
@@ -39,8 +38,6 @@ class Node(object):
     def calculate_fsr(self, feature_index, images_of_class1, images_of_class2):
         vectors_of_class1_images = [self.tempid_to_image_vector[each] for each in images_of_class1]
         vectors_of_class2_images = [self.tempid_to_image_vector[each] for each in images_of_class2]
-        # matrix_of_class1_movies = movie_latent_matrix[indexes_of_class1_movies, feature_index]
-        # matrix_of_class2_movies = movie_latent_matrix[indexes_of_class2_movies, feature_index]
         matrix_of_class1_images = np.vstack(vectors_of_class1_images)
         matrix_of_class2_images = np.vstack(vectors_of_class2_images)
         mean_of_class1 = np.nanmean(matrix_of_class1_images)
@@ -125,46 +122,46 @@ class DecisionTreeLearning:
         self.random_state = random_state
         self.min_samples_leaf = min_samples_leaf
         self.model = None
+        self.tree = None
         pass
 
-    def fit(self, X, y):
-        # self.model = DecisionTreeClassifier(random_state=self.random_state, min_samples_leaf=self.min_samples_leaf)
-        self.model = RandomForestClassifier()
+    def fit_sklearn(self, X, y):
+        self.model = DecisionTreeClassifier(random_state=self.random_state, min_samples_leaf=self.min_samples_leaf)
         print(X, y)
         self.model.fit(X, y)
 
-    def predict(self, X):
+    def predict_sklearn(self, u):
         y = list()
 
-        for i in range(len(X)):
-            pred_label = self.model.predict(X)
+        for i in range(len(u)):
+            pred_label = self.model.predict(u)
             y.append(pred_label[0])
         print(y)
         return y
 
-    def predict_using_DTC(self, tree, X):
+    def predict(self, tree, X):
         if tree.dominant_label:
             return tree.dominant_label
         image_value_for_tag = X[tree.feature_index]
         if image_value_for_tag > tree.mean_value:
-            return self.predict_using_DTC(tree.right, X)
+            return self.predict(tree.right, X)
         else:
-            return self.predict_using_DTC(tree.left, X)
+            return self.predict(tree.left, X)
 
-    def demo_output(self, X, y, X_test):
+    def fit(self, X, y, X_test):
         tempid_to_image_vector = dict()
         for i, vector in enumerate(X): 
             tempid_to_image_vector[i] = vector
         tempid_to_image_label = dict()
         for i, label in enumerate(y): 
             tempid_to_image_label[i] = label
-        # print(tempid_to_image_vector[0])
         node = Node(tempid_to_image_vector, tempid_to_image_label)
-        tree = node.construct_tree()
+        
+        self.tree = node.construct_tree()
 
         predicted_labels = list()
         for X_test_i in X_test:
-            predicted_labels.append(self.predict_using_DTC(tree, X_test_i))
+            predicted_labels.append(self.predict(self.tree, X_test_i))
 
         return predicted_labels
 
@@ -180,11 +177,11 @@ if __name__ == "__main__":
     X_train, y_train = np.vstack(train_df['hog_svd_descriptor'].values), train_df['label'].to_numpy(dtype=int)
 
     # dtl = DecisionTreeLearning()
-    # dtl.fit(X_train, y_train)
-    # test_df['predicted_label'] = dtl.predict(np.vstack(test_df['hog_svd_descriptor'].values))
+    # dtl.fit_sklearn(X_train, y_train)
+    # test_df['predicted_label'] = dtl.predict_sklearn(np.vstack(test_df['hog_svd_descriptor'].values))
 
     dtl2 = DecisionTreeLearning()
-    test_df['predicted_label'] = dtl2.demo_output(X_train, y_train, np.vstack(test_df['hog_svd_descriptor'].values))
+    test_df['predicted_label'] = dtl2.fit(X_train, y_train, np.vstack(test_df['hog_svd_descriptor'].values))
 
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):
         print(test_df.sort_values('imagename'))
