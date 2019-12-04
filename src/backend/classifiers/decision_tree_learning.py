@@ -125,12 +125,12 @@ class DecisionTreeLearning:
         self.tree = None
         pass
 
-    def fit_sklearn(self, X, y):
+    def fit(self, X, y):
         self.model = DecisionTreeClassifier(random_state=self.random_state, min_samples_leaf=self.min_samples_leaf)
         print(X, y)
         self.model.fit(X, y)
 
-    def predict_sklearn(self, u):
+    def predict(self, u):
         y = list()
 
         for i in range(len(u)):
@@ -148,14 +148,14 @@ class DecisionTreeLearning:
         else:
             return self.predict_helper(tree.left, u)
 
-    def predict(self, u):
+    def predict_self(self, u):
         predicted_labels = list()
         for u_i in u:
             predicted_labels.append(self.predict_helper(self.tree, u_i))
 
         return predicted_labels
 
-    def fit(self, X, y):
+    def fit_self(self, X, y):
         tempid_to_image_vector = dict()
         for i, vector in enumerate(X): 
             tempid_to_image_vector[i] = vector
