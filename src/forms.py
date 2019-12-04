@@ -8,18 +8,17 @@ class Task1Form(ModelForm):
         fields = ['number_of_latent_semantics', 'dataset']
 
 
-
 class Task2Form(ModelForm):
     class Meta:
         model = models.Task2Model
         fields = ['number_of_clusters']
 
 
-
 class Task3Form(ModelForm):
     class Meta:
         model = models.Task3Model
         fields = ['most_similar_images']
+
 
 class Task4Form(ModelForm):
     class Meta:
@@ -37,3 +36,4 @@ class Task5Form(ModelForm):
 class Task6Form(ModelForm):
     class Meta:
         model = models.Task6Model
+        fields = ['query_image', 'most_similar_images', 'relevance_feedback']

@@ -5,12 +5,15 @@ from src import models
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-from utils import read_from_pickle
+from utils import read_from_pickle, save_to_pickle
+from database_connection import DatabaseConnection
+import numpy as np
+
 
 
 class Task6(CreateView):
     model = models.Task6Model
-    fields = ('relevance_feedback',)
+    fields = ('query_image', 'most_similar_images', 'relevance_feedback')
     template_name = 'task6.html'
 
     def get_context_data(self, **kwargs):
@@ -20,44 +23,34 @@ class Task6(CreateView):
 
 
 def execute_task6(request):
-    rf = RelevanceFeedback()
-    rel_feedback_type = request.POST.get('relevance_feedback')
-    m = 5
-    q_name = 'Hand_0000012.jpg'
-    q = rf.database_connection.get_feature_data_for_image('histogram_of_gradients', q_name)
-    obj_feature_matrix = rf.database_connection.get_object_feature_matrix_from_db('histogram_of_gradients')
-    data_matrix = obj_feature_matrix['data_matrix']
+    query_image = request.POST.get('query_image')
+    most_similar_images = int(request.POST.get('most_similar_images'))
+    relevance_feedback = request.POST.get('relevance_feedback')
+    lsh = read_from_pickle('lsh_model')
+    db_connection = DatabaseConnection()
+    image_vector = db_connection.get_feature_data_for_image('histogram_of_gradients', query_image)
+    image_vector = np.asarray(image_vector.flatten())
 
-    if rel_feedback_type == 'Probabilistic':
-        n_i = rf.calculate_n_i(D_matrix=data_matrix)
-        initial_list_images = rf.calculate_initial_prob_similarity(D_matrix=data_matrix,
-                                                                   images=obj_feature_matrix['images'], n_i=n_i)
-        initial_list_images = initial_list_images[:m]
-        return render(request, 'visualize_images.html',
-                      {'images': initial_list_images, "from_task": "task6", "rel_type": rel_feedback_type, "q": q_name,
-                       "t": m})
+    if read_from_pickle('all_img_features_LSH.pickle') != None:
+        all_image_hog_features = read_from_pickle('all_img_features_LSH.pickle')
+    else:
+        all_image_hog_features = db_connection.get_object_feature_matrix_from_db(tablename='histogram_of_gradients')
+        save_to_pickle(all_image_hog_features, 'all_img_features_LSH.pickle')
 
-    elif rel_feedback_type == 'Support Vector Machine':
-        print('SVM')
-        init_ranking, Vt = rf.get_init_ranking(obj_feature_matrix=obj_feature_matrix, q=q)
-        return render(request, 'visualize_images.html',
-                      {'images': init_ranking, "from_task": "task6", "rel_type": rel_feedback_type, "q": q_name,
-                       "t": m})
-        # new_rank_list=rf.get_SVM_based_feedback(init_rank_list=init_ranking,q=q,q_name=q_name,Vt=Vt)
+    (sorted_k_values, result_stats) = lsh.find_ksimilar_images(k=most_similar_images, image_vector=image_vector,
+                                                               all_image_hog_features=all_image_hog_features)
 
-    elif rel_feedback_type == 'Decision Tree Classifier':
-        print('DTC')
-        init_ranking, Vt = rf.get_init_ranking(obj_feature_matrix=obj_feature_matrix, q=q)
-        return render(request, 'visualize_images.html',
-                      {'images': init_ranking, "from_task": "task6", "rel_type": rel_feedback_type, "q": q_name,
-                       "t": m})
+    # Now getting a bigger test dataset for relevance feedback
+    (test_dataset, result_stats) = lsh.find_ksimilar_images(k=10 + most_similar_images, image_vector=image_vector,
+                                                            all_image_hog_features=all_image_hog_features)
 
-    elif rel_feedback_type == 'Personalized Page Rank':
-        print('PPR')
-        init_ranking, Vt = rf.get_init_ranking(obj_feature_matrix=obj_feature_matrix, q=q)
-        return render(request, 'visualize_images.html',
-                      {'images': init_ranking, "from_task": "task6", "rel_type": rel_feedback_type, "q": q_name,
-                       "t": m})
+    save_to_pickle(test_dataset, 'test_dataset.pickle')
+    print(sorted_k_values[:most_similar_images])
+    return render(request, 'visualize_images.html',
+                  {'images': sorted_k_values[:most_similar_images], "from_task": "task5",
+                   'rel_type': relevance_feedback,
+                   "q": query_image, "t": most_similar_images,
+                   "num_total": result_stats['total'], "num_unique": result_stats['unique']})
 
 
 @csrf_exempt
