@@ -7,7 +7,6 @@ from django.views.generic import CreateView
 from src import models
 from django.http import HttpResponse
 import json
-
 from backend.pageRank import PageRank
 from django.shortcuts import render
 from backend.utils import get_pickle_directory
@@ -44,5 +43,4 @@ def execute_task3(request):
     #                                                "/Labelled/Set2")
     # Output of Sample Query 1 Task 3
     dominant_images = pg_obj.get_K_dominant_images(k, K, user_images, folder_name)
-    # return HttpResponse('You received a response'+json.dumps(similar_objects), status=200)
     return render(request, 'visualize_images.html', {'images': dominant_images, "from_task": "task3"})

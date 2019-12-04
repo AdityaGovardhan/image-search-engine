@@ -10,11 +10,11 @@ class LSH:
         self.rand_vectors = {}
         self.num_layers = l
         self.num_hash_functions = k
-        self.all_layers_representation={}
-        self.final_grouped={}
-        self.query_image_bin_reprsnt={}
-        self.num_of_reduced_times=0
-        self.resultset={'unique':None,'total':None}
+        self.all_layers_representation = {}
+        self.final_grouped = {}
+        self.query_image_bin_reprsnt = {}
+        self.num_of_reduced_times = 0
+        self.resultset = {'unique': None, 'total': None}
 
     # Create image representation for each image per layer 
     def generate_data_representation(self, layer, data_points=[], image_names=[]):
@@ -86,20 +86,21 @@ class LSH:
     # Tries to find k similar images 
     def find_ksimilar_images(self, k, image_vector, all_image_hog_features):
         similar_images = self.process_query_image(image_vector)
-        while(k > len(similar_images) and self.num_of_reduced_times < self.num_hash_functions - 1):
+        while (k > len(similar_images) and self.num_of_reduced_times < self.num_hash_functions - 1):
             all_result_images = self.get_images_by_reducing_representation()
             similar_images.extend(all_result_images)
             list_set = set(similar_images)
             self.resultset['total'] = len(similar_images)
             similar_images = (list(list_set))
             self.resultset['unique'] = len(similar_images)
-        
+
         # need to implement euclidean distance comparision
         # not neccessarily should happen here
-        final_similar_images = self.get_sorted_k_values(num_similar_images=k,similar_images=similar_images,all_image_hog_features=all_image_hog_features,
-                                        image_vector=image_vector)
-        return (final_similar_images,self.resultset)
-            
+        final_similar_images = self.get_sorted_k_values(num_similar_images=k, similar_images=similar_images,
+                                                        all_image_hog_features=all_image_hog_features,
+                                                        image_vector=image_vector)
+        return (final_similar_images, self.resultset)
+
     # Finds similar images by reducing representation 
     def get_images_by_reducing_representation(self):
         query_image_representation = self.query_image_bin_reprsnt

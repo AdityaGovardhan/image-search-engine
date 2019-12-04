@@ -258,3 +258,12 @@ if __name__ == '__main__':
     svm = support_vector_machine.SupportVectorMachine()
     svm.plot()
 
+if __name__ == '__main__':
+    rf = RelevanceFeedback()
+    # q_name='Hand_0000012.jpg'
+    # q=rf.database_connection.get_feature_data_for_image('histogram_of_gradients',q_name)
+    # obj_feature_matrix=rf.database_connection.get_object_feature_matrix_from_db('histogram_of_gradients')
+    # init_ranking,Vt=rf.get_init_ranking(obj_feature_matrix=obj_feature_matrix,q=q)
+    # new_rank_list=rf.get_SVM_based_feedback(init_rank_list=init_ranking,q=q,q_name=q_name,Vt=Vt)
+    svm = support_vector_machine.SupportVectorMachine()
+    svm.plot()
