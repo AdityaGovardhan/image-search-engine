@@ -42,10 +42,12 @@ class Task1Model(models.Model):
     labelled_dataset = models.CharField(max_length=6, choices=datasets, default='set1')
     Unlabelled_dataset = models.CharField(max_length=6, choices=datasets, default='set1')
 
+
 class Task2Model(models.Model):
     number_of_clusters = models.CharField(max_length=2)
     labelled_dataset = models.CharField(max_length=6, choices=datasets, default='set1')
     Unlabelled_dataset = models.CharField(max_length=6, choices=datasets, default='set1')
+
 
 class Task3Model(models.Model):
     most_similar_images = models.CharField(max_length=2, verbose_name = "Number of Most Similar Images")
@@ -57,7 +59,8 @@ class Task3Model(models.Model):
 
 class Task4Model(models.Model):
     classifier = models.CharField(max_length=6, choices=classifiers, default='Support Vector Machine')
-    dataset = models.CharField(max_length=6, choices=datasets, default='set1')
+    labelled_dataset = models.CharField(max_length=6, choices=datasets, default='set1')
+    unlabelled_dataset = models.CharField(max_length=6, choices=datasets, default='set1')
     number_of_clusters = models.CharField(max_length=6, choices=number_of_total_clusters, default='200')
     kernel = models.CharField(max_length=6, choices=kernels, default='linear')
     labelled_folder_name = models.CharField(max_length=100, verbose_name="Labelled Folder Path")
