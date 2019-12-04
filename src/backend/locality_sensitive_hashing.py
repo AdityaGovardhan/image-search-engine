@@ -124,8 +124,6 @@ class LSH:
 
     def get_sorted_k_values(self,num_similar_images,similar_images,all_image_hog_features,image_vector):
         similar_images_vectors = []
-        print("num_similar_images",num_similar_images)
-        print("similar_images",len(similar_images))
         if(num_similar_images <= len(similar_images)):
             for i in similar_images:
                 index = all_image_hog_features['images'].index(i)
