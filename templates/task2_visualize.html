@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% block javascript %}
+    <script src = "{% static 'feedback.js' %}"> </script>
+    {% endblock javascript %}
+</head>
+
+<style>
+    {% block css %}
+    .heading{
+        font-size: 20px;
+        text-align: center;
+    }
+    .imgContainer{
+        float:left;
+        padding: 20px;
+    }
+    {% endblock css %}
+</style>
+
+<body>
+
+    {% block result %}
+    <div id="load" style="display:none"><img src="/static/ajax-loading-icon.jpg"/></div>
+        <div class="heading">
+            {% if from_task == "task4" %}
+                <p> Classifier = {{ classifier }}</p>
+                <p>Accuracy = {{ accuracy }}% </p>
+            {% endif %}
+
+            {% if from_task == "task5" %}
+                <p> Relevance Feedback = {{ rel_type }} </p>
+                <p> Total number of images considered : {{num_total}}</p>
+                <p> Unique number of images considered : {{num_unique}}</p>
+            {% endif %}
+        </div>
+
+        <div id="showResults">
+            <div>
+                {% for image in cluster_images %}
+                <div class="imgContainer">
+                    <img src="{% static image.0 %}" height="200" width="200"/>
+                    <p>Image: {{ image.0 }}</p>
+                    <p>{% if from_task == "task2" %} Cluster ID:  {% else %}  Score: {% endif %} {{ image.1 }}</p>
+                    {% if from_task == "task6" or from_task == "task5" and rel_type != "None" %}
+                        <label class="btn btn-success active">
+                            <input class="radio_button" type="radio" tag="relevant" name="{{ image.0 }}" id="relevant_{{ image.0 }}" autocomplete="off" unchecked> Relevant
+                        </label>
+                        <label class="btn btn-danger active">
+                            <input class="radio_button" type="radio" tag="irrelevant" name="{{ image.0 }}" id="irrelevant_{{ image.0 }}" autocomplete="off" unchecked> Irrelevant
+                        </label>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            </div>
+            <hr>
+            <div id="images">
+
+                {% for image in labelled_images %}
+                <div class="imgContainer">
+                    <img src="{% static image.0 %}" height="200" width="200"/>
+                    <p>Image: {{ image.0 }}</p>
+                    <p>{% if from_task == "task2" %} Label:  {% else %}  Score: {% endif %} {{ image.1 }}</p>
+                    {% if from_task == "task6" or from_task == "task5" and rel_type != "None" %}
+                        <label class="btn btn-success active">
+                            <input class="radio_button" type="radio" tag="relevant" name="{{ image.0 }}" id="relevant_{{ image.0 }}" autocomplete="off" unchecked> Relevant
+                        </label>
+                        <label class="btn btn-danger active">
+                            <input class="radio_button" type="radio" tag="irrelevant" name="{{ image.0 }}" id="irrelevant_{{ image.0 }}" autocomplete="off" unchecked> Irrelevant
+                        </label>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            </div>
+
+
+            {% if from_task == "task6" or from_task == "task5" and rel_type != "None" %}
+                <button id="submit_feedback_button"  type="submit" q="{{q}}" t="{{t}}" class="btn btn-primary" rel_type="{{ rel_type }}" csrf_token="{{ csrf_token }}" >Submit Feedback</button>
+            {% endif %}
+        </div>
+    {% endblock result%}
+</body>
+</html>

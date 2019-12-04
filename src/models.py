@@ -44,7 +44,7 @@ class Task1Model(models.Model):
 
 class Task2Model(models.Model):
     number_of_clusters = models.CharField(max_length=2)
-
+    dataset = models.CharField(max_length=6, choices=datasets, default='set1')
 
 class Task3Model(models.Model):
     most_similar_images = models.CharField(max_length=2, verbose_name = "Number of Most Similar Images")

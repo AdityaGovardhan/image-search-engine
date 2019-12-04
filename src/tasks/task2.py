@@ -10,7 +10,7 @@ from image_clustering import Image_Clustering
 
 class Task2(CreateView):
     model = models.Task2Model
-    fields = ('number_of_clusters',)
+    fields = ('number_of_clusters','dataset',)
     template_name = 'task2.html'
 
     def get_context_data(self, **kwargs):
@@ -21,9 +21,12 @@ class Task2(CreateView):
 
 def execute_task2(request):
     no_of_clusters = int(request.POST.get("number_of_clusters"))
-    relative_folder_path = "/Labelled/Set1"  # request.POST.get("folder_name")
+    dataset = request.POST.get("dataset")
+
+    labelled_folder_path = "/Labelled/" + dataset
+    unlabelled_folder_path = "/Unlabelled/" + dataset
 
     clustering_obj = Image_Clustering()
-    prediction = clustering_obj.cluster_images(no_of_clusters, relative_folder_path)
+    points_in_cluster, prediction = clustering_obj.cluster_images(no_of_clusters, labelled_folder_path, unlabelled_folder_path)
 
-    return render(request, 'visualize_images.html', {'images': prediction, "from_task": "task2"})
+    return render(request, 'task2_visualize.html', {'cluster_images': points_in_cluster,'labelled_images': prediction, "from_task": "task2"})
