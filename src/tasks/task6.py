@@ -41,8 +41,12 @@ def execute_task6(request):
                                                                all_image_hog_features=all_image_hog_features)
 
     # Now getting a bigger test dataset for relevance feedback
-    (test_dataset, result_stats) = lsh.find_ksimilar_images(k=10 + most_similar_images, image_vector=image_vector,
+    if relevance_feedback == "Probabilistic":
+        (test_dataset, result_stats) = lsh.find_ksimilar_images(k=10 + most_similar_images, image_vector=image_vector,
                                                             all_image_hog_features=all_image_hog_features)
+    else:
+        (test_dataset, result_stats) = lsh.find_ksimilar_images(k=200 + most_similar_images, image_vector=image_vector,
+                                                                all_image_hog_features=all_image_hog_features)
 
     save_to_pickle(test_dataset, 'test_dataset.pickle')
     print(sorted_k_values[:most_similar_images])
