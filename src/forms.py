@@ -36,4 +36,4 @@ class Task5Form(ModelForm):
 class Task6Form(ModelForm):
     class Meta:
         model = models.Task6Model
-        fields = ['query_image', 'most_similar_images', 'relevance_feedback']
+        fields = ['query_image','query_image_folder_name', 'most_similar_images', 'relevance_feedback']

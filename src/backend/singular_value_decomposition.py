@@ -28,6 +28,14 @@ class SingularValueDecomposition:
         transformed_data = np.matmul(u, s)
         return transformed_data
 
+    def get_transformed_data_copy(self, data_matrix, k=10):
+        u, s, vt = self.get_svd_decomposition(data_matrix)
+        u = np.array(u[:,:k])
+        s = np.diag(s[:k])
+        vt = np.array(vt[:k,:])
+        transformed_data = np.matmul(u, s)
+        return transformed_data,vt
+
     def fit(self, data_matrix):
         self.U, self.S, self.Vt = np.linalg.svd(data_matrix)
 
