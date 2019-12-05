@@ -38,6 +38,11 @@ def execute_task4(request):
         classifier_caller.call_classifier()
         # time.sleep(4)
         result, images_with_labels = classifier_caller.get_result()
-        return render(request, 'visualize_images.html',
-                      {'images': images_with_labels, "from_task": "task4",
-                       "accuracy": result['accuracy']*100, "classifier": classifier})
+        if result:
+            return render(request, 'visualize_images.html',
+                          {'images': images_with_labels, "from_task": "task4",
+                           "accuracy": result['accuracy']*100, "classifier": classifier})
+        else:
+            return render(request, 'visualize_images.html',
+                          {'images': images_with_labels, "from_task": "task4",
+                           "accuracy": "Images not available in 11k Dataset", "classifier": classifier})

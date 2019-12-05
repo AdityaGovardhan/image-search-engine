@@ -83,13 +83,17 @@ class DatabaseConnection:
     def get_correct_labels_for_given_images(self, image_names=None, label_type=None, tablename='metadata'):
         conn = self.get_db_connection()
         cursor = conn.cursor()
-        if not image_names:
-            query = "SELECT imagename, {1} FROM {0}".format(tablename, label_type)
-        else:
-            query = "SELECT imagename, {1} FROM {0} WHERE imagename IN {2}".format(tablename, label_type, tuple(image_names))
-        cursor.execute(query)
-        result = cursor.fetchall()
-        return result
+        try:
+            if not image_names:
+                query = "SELECT imagename, {1} FROM {0}".format(tablename, label_type)
+            else:
+                query = "SELECT imagename, {1} FROM {0} WHERE imagename IN {2}".format(tablename, label_type, tuple(image_names))
+            cursor.execute(query)
+            result = cursor.fetchall()
+            return result
+        except:
+            return None
+
 
     #################
     # Image Queries #

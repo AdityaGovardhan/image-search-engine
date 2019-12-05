@@ -17,6 +17,7 @@ class ClassifierCaller:
         self.algo = dimensionality_algo
         self.kernel = kernel
         self.number_of_clusters = number_of_clusters
+        self.images_not_present = False
 
     def call_classifier(self):
         if self.classifier_name == "Support Vector Machine":
@@ -34,7 +35,7 @@ class ClassifierCaller:
             train_table_metadata = 'metadata_labelled_' + self.training_dataset.lower()
             test_table = 'sift_unlabelled_' + self.testing_dataset.lower() + '_' + self.number_of_clusters
 
-            train_df, self.test_df = utils.get_train_and_test_dataframes_from_db(train_table, train_table_metadata,
+            train_df, self.test_df, self.images_not_present = utils.get_train_and_test_dataframes_from_db(train_table, train_table_metadata,
                                                                                  test_table, algo=self.algo)
 
         elif self.algo == "pca":
@@ -43,7 +44,7 @@ class ClassifierCaller:
             train_table = 'local_binary_pattern_labelled_' + self.training_dataset.lower()
             train_table_metadata = 'metadata_labelled_' + self.training_dataset.lower()
             test_table = 'local_binary_pattern_unlabelled_' + self.testing_dataset.lower()
-            train_df, self.test_df = utils.get_train_and_test_dataframes_from_db(train_table, train_table_metadata,
+            train_df, self.test_df, self.images_not_present = utils.get_train_and_test_dataframes_from_db(train_table, train_table_metadata,
                                                                                  test_table, num_dims=k, algo="pca")
 
         elif self.algo == "svd":
@@ -52,7 +53,7 @@ class ClassifierCaller:
             train_table_metadata = 'metadata_labelled_' + self.training_dataset.lower()
             test_table = 'histogram_of_gradients_unlabelled_' + self.testing_dataset.lower()
 
-            train_df, self.test_df = utils.get_train_and_test_dataframes_from_db(train_table, train_table_metadata,
+            train_df, self.test_df, self.images_not_present = utils.get_train_and_test_dataframes_from_db(train_table, train_table_metadata,
                                                                                  test_table, num_dims=k, algo="svd")
         X_train, y_train = np.vstack(train_df['hog_svd_descriptor'].values), train_df['label'].to_numpy(
             dtype=int)
@@ -70,8 +71,11 @@ class ClassifierCaller:
         # print(result)
 
     def get_result(self):
-        self.result = utils.get_result_metrics(self.classifier_name, self.test_df['expected_label'],
+        if not self.images_not_present:
+            self.result = utils.get_result_metrics(self.classifier_name, self.test_df['expected_label'],
                                                self.test_df['predicted_label'])
+        else:
+            self.result = None
         print(self.result)
         images_with_labels = []
         for index, row in self.test_df.iterrows():

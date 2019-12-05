@@ -72,18 +72,19 @@ class Task1_Classifier:
                                                                                 "metadata")
 
         prediction = sorted(predicted_labels, key=lambda k: k[0])
+        if query_list_of_labels:
+            query_list_of_labels = sorted(query_list_of_labels, key=lambda k: k[0])
+            accuracy = 0.0
+            for (image_name, predicted_label), (image2, correct_label) in zip(prediction, query_list_of_labels):
+                # print(image_name, predicted_label,image2, correct_label)
+                correct_label = correct_label.split(' ')[0]
+                if (image_name == image2 and correct_label == predicted_label):
+                    accuracy += 1
 
-        query_list_of_labels = sorted(query_list_of_labels, key=lambda k: k[0])
-
-        accuracy = 0.0
-        for (image_name, predicted_label), (image2, correct_label) in zip(prediction, query_list_of_labels):
-            # print(image_name, predicted_label,image2, correct_label)
-            correct_label = correct_label.split(' ')[0]
-            if (image_name == image2 and correct_label == predicted_label):
-                accuracy += 1
-
-        accuracy = 100 * accuracy / float(len(query_image_names))
-        print("The accuracy is " + str(accuracy))
+            accuracy = 100 * accuracy / float(len(query_image_names))
+            print("The accuracy is " + str(accuracy))
+        else:
+            print("Images not presented in 11 K dataset")
 
         print(prediction)
         return prediction

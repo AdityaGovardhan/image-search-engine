@@ -217,6 +217,7 @@ def calculate_classification_accuracy(pred_labels, correct_labels):
 
 
 def get_train_and_test_dataframes_from_db(train_table, train_table_metadata, test_table, num_dims=None, algo="svd"):
+    images_not_present = False
     label_map = {"dorsal": -1, "palmar": 1}
 
     # retrieve data
@@ -245,7 +246,11 @@ def get_train_and_test_dataframes_from_db(train_table, train_table_metadata, tes
 
     # convert list of tuples to dict
     train_labels_map = dict(db.get_correct_labels_for_given_images(train_images, 'aspectOfHand', train_table_metadata))
-    exp_test_labels_map = dict(db.get_correct_labels_for_given_images(test_images, 'aspectOfHand'))
+    result_from_db = db.get_correct_labels_for_given_images(test_images, 'aspectOfHand')
+    if not result_from_db:
+        exp_test_labels_map = None
+    else:
+        exp_test_labels_map = dict(result_from_db)
 
     # dataframe setup starts here
     # train_df
@@ -260,13 +265,17 @@ def get_train_and_test_dataframes_from_db(train_table, train_table_metadata, tes
     # test_df
     test_col_names = ['imagename', 'hog_svd_descriptor', 'expected_label', 'predicted_label']
     test_df = pd.DataFrame(columns=test_col_names)
+    if exp_test_labels_map:
+        for i, image in enumerate(test_images):
+            temp = exp_test_labels_map[image]
+            label = temp.split(' ')[0]
+            test_df.loc[len(test_df)] = [image, tf_test_data[i], label_map[label], 'null']
+    else:
+        for i, image in enumerate(test_images):
+            images_not_present = True
+            test_df.loc[len(test_df)] = [image, tf_test_data[i], 'null', 'null']
 
-    for i, image in enumerate(test_images):
-        temp = exp_test_labels_map[image]
-        label = temp.split(' ')[0]
-
-        test_df.loc[len(test_df)] = [image, tf_test_data[i], label_map[label], 'null']
-    return train_df, test_df
+    return train_df, test_df, images_not_present
 
 
 def get_result_metrics(classifier_name, y_expected, y_predicted):
