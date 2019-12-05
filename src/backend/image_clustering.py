@@ -19,9 +19,10 @@ class Image_Clustering:
 
     def intialize_cluster_centres(self, points, no_of_clusters):
         no_of_points = len(points)
-        first_point = round((np.random.random((1)) * no_of_points).tolist()[0])
-        print(first_point)
-        list_of_centre = [points[first_point]]
+        # first_point = round((np.random.random((1)) * no_of_points).tolist()[0])
+        # print(first_point)
+        # list_of_centre = [points[first_point]]
+        list_of_centre = [points[0]]
         for centre in range(2, no_of_clusters):
             max_avg_dist = 0
             for point in points:
@@ -39,9 +40,9 @@ class Image_Clustering:
 
     def k_means(self, points, no_of_centres):
 
-        list_of_centre = (points.shape[0] * np.random.rand(no_of_centres,1)).tolist()
+        # list_of_centre = (points.shape[0] * np.random.rand(no_of_centres,1)).tolist()
         points = points.tolist()
-        # list_of_centre = self.intialize_cluster_centres(points, no_of_clusters)
+        list_of_centre = self.intialize_cluster_centres(points, no_of_clusters)
         clusters_points = {}
         old_clusters_centroid = {}
 
@@ -107,7 +108,7 @@ class Image_Clustering:
                 palmar_data_matrix.append(latent_semantic[image_names.index(image)])
 
         palmer_list_of_centers = self.k_means(np.array(palmar_data_matrix), no_of_clusters)
-        dorsal_list_of_centers = self.k_means(np.array(palmar_data_matrix), no_of_clusters)
+        dorsal_list_of_centers = self.k_means(np.array(dorsal_data_matrix), no_of_clusters)
 
         # print(palmer_list_of_centers, dorsal_list_of_centers)
 
@@ -170,9 +171,6 @@ class Image_Clustering:
 
         accuracy = 100*accuracy/float(len(query_image_names))
         print("The accuracy is "+ str(accuracy))
-
-
-
 
         points_in_cluster = sorted(points_in_cluster, key=lambda k: k[1])
 
