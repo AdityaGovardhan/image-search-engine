@@ -48,11 +48,13 @@ class PPRClassifier:
         images_with_labels = [(img, "dorsal") if ranked_images_using_dorsal[img] > ranked_images_using_palmer[img] else (img, "palmar") for img in unlabeled_image_names]
 
         correct_labels = db_conn.get_correct_labels_for_given_images(image_names=unlabeled_image_names, label_type="aspectOfHand")
+        if correct_labels:
+            acc = calculate_classification_accuracy(convert_tuple_to_dict(images_with_labels), convert_tuple_to_dict(correct_labels))
 
-        acc = calculate_classification_accuracy(convert_tuple_to_dict(images_with_labels), convert_tuple_to_dict(correct_labels))
-
-        print("********************************************")
-        print("Accuracy = ", acc)
+            print("********************************************")
+            print("Accuracy = ", acc)
+        else:
+            acc = "Images not presented in 11 K dataset"
 
         return images_with_labels, acc
 

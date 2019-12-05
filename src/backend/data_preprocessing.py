@@ -41,8 +41,8 @@ class DataPreProcessor:
 
         charas = ["Labelled", "Unlabelled"]
         # sets = ["Set1", "Set2", "Set3", "Set4"]
-        sets = ["Set1", "Set2"]
-        number_of_clusters = ['200', '250', '300']
+        sets = ["Set1", "Set2", "Set3"]
+        number_of_clusters = ['250', '300']
         path = []
         feature_models = []
         for chara_ in charas:
