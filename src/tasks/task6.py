@@ -5,7 +5,7 @@ from src import models
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-from utils import read_from_pickle, save_to_pickle
+from utils import read_from_pickle, save_to_pickle , convert_folder_path_to_table_name
 from database_connection import DatabaseConnection
 from singular_value_decomposition import SingularValueDecomposition
 import numpy as np
@@ -14,7 +14,7 @@ import numpy as np
 
 class Task6(CreateView):
     model = models.Task6Model
-    fields = ('query_image', 'most_similar_images', 'relevance_feedback')
+    fields = ('query_image','query_image_folder_name', 'most_similar_images', 'relevance_feedback')
     template_name = 'task6.html'
 
     def get_context_data(self, **kwargs):
@@ -26,6 +26,7 @@ class Task6(CreateView):
 def execute_task6(request):
     query_image = request.POST.get('query_image')
     most_similar_images = int(request.POST.get('most_similar_images'))
+    query_image_folder_name = request.POST.get('query_image_folder_name')
     relevance_feedback = request.POST.get('relevance_feedback')
     lsh = read_from_pickle('lsh_model')
     db_connection = DatabaseConnection()
@@ -39,16 +40,19 @@ def execute_task6(request):
         save_to_pickle(all_image_hog_features,'all_img_features_LSH.pickle')
     #SVD on hog features
     if(read_from_pickle('svd_hog_lsh.pickle')!=None):
-        transformed_data = read_from_pickle('svd_hog_lsh.pickle')
-        transformed_data = transformed_data['data_matrix']
+        svd_obj = read_from_pickle('svd_hog_lsh.pickle')
+        transformed_data = svd_obj['data_matrix']
+        vt = svd_obj['vt']
     else:
         svd = SingularValueDecomposition()
-        transformed_data = svd.get_transformed_data(all_image_hog_features['data_matrix'],400)
-        save_to_pickle({"data_matrix":transformed_data,"images":all_image_hog_features['images']},'svd_hog_lsh.pickle')
+        transformed_data,vt = svd.get_transformed_data_copy(all_image_hog_features['data_matrix'],400)
+        save_to_pickle({"data_matrix":transformed_data,"images":all_image_hog_features['images'],"vt":vt},'svd_hog_lsh.pickle')
 
-    index_of_query_image = (all_image_hog_features['images']).index(query_image)
-    image_vector = transformed_data[index_of_query_image]
-    image_vector = np.asarray(image_vector.flatten())
+    if(query_image_folder_name!=''):
+        table_name = convert_folder_path_to_table_name(query_image_folder_name,'histogram_of_gradients')
+        image_vector = db_connection.get_feature_data_for_image(table_name,query_image)
+
+    image_vector = np.dot(image_vector.astype(float), np.transpose(vt))
 
     new_obj={}
     new_obj['data_matrix'] = transformed_data

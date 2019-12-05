@@ -78,6 +78,7 @@ class Task5Model(models.Model):
 class Task6Model(models.Model):
     query_image = models.CharField(max_length=100)
     most_similar_images = models.CharField(max_length=2, verbose_name="Number of Most Similar Images")
+    query_image_folder_name = models.CharField(max_length=100, verbose_name="Folder Path")
     relevance_feedback = models.CharField(max_length=6, choices=task_6_relevance_feedbacks, default='Probabilistic')
     # pass
 

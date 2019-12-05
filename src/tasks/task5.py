@@ -32,12 +32,13 @@ def execute_task5(request):
         save_to_pickle(all_image_hog_features,'all_img_features_LSH.pickle')
     #SVD on hog features
     if(read_from_pickle('svd_hog_lsh.pickle')!=None):
-        transformed_data = read_from_pickle('svd_hog_lsh.pickle')
-        transformed_data = transformed_data['data_matrix']
+        svd_obj = read_from_pickle('svd_hog_lsh.pickle')
+        transformed_data = svd_obj['data_matrix']
+        vt = svd_obj['vt']
     else:
         svd = SingularValueDecomposition()
-        transformed_data = svd.get_transformed_data(all_image_hog_features['data_matrix'],400)
-        save_to_pickle({"data_matrix":transformed_data,"images":all_image_hog_features['images']},'svd_hog_lsh.pickle')
+        transformed_data,vt = svd.get_transformed_data_copy(all_image_hog_features['data_matrix'],400)
+        save_to_pickle({"data_matrix":transformed_data,"images":all_image_hog_features['images'],"vt":vt},'svd_hog_lsh.pickle')
 
     # index_of_query_image = (all_image_hog_features['images']).index(query_image)
     # image_vector = transformed_data[index_of_query_image]
