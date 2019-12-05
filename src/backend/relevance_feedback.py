@@ -138,7 +138,7 @@ class RelevanceFeedback:
 
         pg_obj = PageRank()
         image_similarity_matrix = pg_obj.get_image_similarity_matrix_for_top_k_images(6, svd_image_data)
-        seed_vector = pg_obj.get_seed_vector(rel_items, image_names)
+        seed_vector = pg_obj.get_seed_vector(rel_items, image_names, irl_items)
         pie = pg_obj.get_page_rank_eigen_vector(image_similarity_matrix, seed_vector)
         new_rank_list = pg_obj.get_top_K_images_based_on_scores(pie, image_names, m)
 

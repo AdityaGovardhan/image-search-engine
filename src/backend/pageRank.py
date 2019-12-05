@@ -58,14 +58,26 @@ class PageRank:
         pie = np.matmul(interim, S)
         return pie
 
-    def get_seed_vector(self, imageIDs, all_images):
+    def get_seed_vector(self, imageIDs, all_images, irrel_items = None):
         all_images = np.array(all_images)
-        S = np.zeros(len(all_images))
+        total_images = len(all_images)
+        S = np.zeros(total_images)
         total_user_images = len(imageIDs)
+        rel_weight = 1
+
+        if irrel_items:
+            S = S*(0.1/(total_images - (total_user_images + len(irrel_items))))
+            rel_weight = 0.9
+            for image in irrel_items:
+                print(irrel_items, np.where(all_images == image))
+                index = np.where(all_images == image)[0][0]
+                S[index] = 0
 
         for image in imageIDs:
             index = np.where(all_images == image)[0][0]
-            S[index] = 1/total_user_images
+            S[index] = rel_weight/total_user_images
+
+
 
         S = np.array(S)
         S = S.reshape(S.shape[0], 1)
