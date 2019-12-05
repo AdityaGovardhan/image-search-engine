@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from utils import read_from_pickle, save_to_pickle
 from database_connection import DatabaseConnection
+from singular_value_decomposition import SingularValueDecomposition
 import numpy as np
 
 
@@ -35,18 +36,33 @@ def execute_task6(request):
         all_image_hog_features = read_from_pickle('all_img_features_LSH.pickle')
     else:
         all_image_hog_features = db_connection.get_object_feature_matrix_from_db(tablename='histogram_of_gradients')
-        save_to_pickle(all_image_hog_features, 'all_img_features_LSH.pickle')
+        save_to_pickle(all_image_hog_features,'all_img_features_LSH.pickle')
+    #SVD on hog features
+    if(read_from_pickle('svd_hog_lsh.pickle')!=None):
+        transformed_data = read_from_pickle('svd_hog_lsh.pickle')
+        transformed_data = transformed_data['data_matrix']
+    else:
+        svd = SingularValueDecomposition()
+        transformed_data = svd.get_transformed_data(all_image_hog_features['data_matrix'],400)
+        save_to_pickle({"data_matrix":transformed_data,"images":all_image_hog_features['images']},'svd_hog_lsh.pickle')
 
+    index_of_query_image = (all_image_hog_features['images']).index(query_image)
+    image_vector = transformed_data[index_of_query_image]
+    image_vector = np.asarray(image_vector.flatten())
+
+    new_obj={}
+    new_obj['data_matrix'] = transformed_data
+    new_obj['images'] = all_image_hog_features['images']
     (sorted_k_values, result_stats) = lsh.find_ksimilar_images(k=most_similar_images, image_vector=image_vector,
-                                                               all_image_hog_features=all_image_hog_features)
+                                                               all_image_hog_features=new_obj)
 
     # Now getting a bigger test dataset for relevance feedback
     if relevance_feedback == "Probabilistic":
         (test_dataset, result_stats) = lsh.find_ksimilar_images(k=10 + most_similar_images, image_vector=image_vector,
-                                                            all_image_hog_features=all_image_hog_features)
+                                                            all_image_hog_features=new_obj)
     else:
         (test_dataset, result_stats) = lsh.find_ksimilar_images(k=200 + most_similar_images, image_vector=image_vector,
-                                                                all_image_hog_features=all_image_hog_features)
+                                                                all_image_hog_features=new_obj)
 
     save_to_pickle(test_dataset, 'test_dataset.pickle')
     print(sorted_k_values[:most_similar_images])
