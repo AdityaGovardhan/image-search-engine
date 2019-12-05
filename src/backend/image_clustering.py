@@ -42,7 +42,7 @@ class Image_Clustering:
 
         # list_of_centre = (points.shape[0] * np.random.rand(no_of_centres,1)).tolist()
         points = points.tolist()
-        list_of_centre = self.intialize_cluster_centres(points, no_of_clusters)
+        list_of_centre = self.intialize_cluster_centres(points, no_of_centres)
         clusters_points = {}
         old_clusters_centroid = {}
 
