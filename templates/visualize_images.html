@@ -50,7 +50,7 @@
                     <img src="{% static image.0 %}" height="200" width="200"/>
                     <p>Image: {{ image.0 }}</p>
                     <p>{% if from_task == "task1" or from_task == "task4" %} Label: {% elif from_task == "task2" %}
-                        Cluster ID:  {% else %}  Score: {% endif %} {{ image.1 }}</p>
+                        Cluster ID:  {% else %}  Distance: {% endif %} {{ image.1 }}</p>
                     {% if from_task == "task6" or from_task == "task5" and rel_type != "None" %}
                         <label class="btn btn-success active">
                             <input class="radio_button" type="radio" tag="relevant" name="{{ image.0 }}"

@@ -22,7 +22,7 @@ class RelevanceFeedback:
         self.conn = self.database_connection.get_db_connection()
         print('Initiating RelevanceFeedback....')
 
-    def compute_new_query_vector(self, q_old, relevant_items, irrel_items, alpha=0.5, beta=0.45, gamma=0.05):
+    def compute_new_query_vector(self, q_old, relevant_items, irrel_items, alpha=0.3, beta=0.65, gamma=0.05):
         print('Computing new query vector.....')
 
         avg_rel_vec = np.zeros(q_old.shape)
@@ -88,6 +88,10 @@ class RelevanceFeedback:
         X_test, imageNames = self.create_X_test_as_np_matrix(test_dataset=test_dataset)
         Y_pred = svm.predict(u=X_test)
         relevant_pred_img_names = [imageNames[i] for i in range(0, len(Y_pred)) if Y_pred[i] == 1]
+        length_relevant_images = len(relevant_pred_img_names)
+        if length_relevant_images < m:
+            irr_image_names = [imageNames[i] for i in range(0, m - length_relevant_images) if Y_pred[i] == -1]
+            relevant_pred_img_names.extend(irr_image_names)
         new_obj_feature_matrix = self.database_connection.HOG_descriptor_from_image_ids(
             image_ids=relevant_pred_img_names)
 
@@ -96,21 +100,29 @@ class RelevanceFeedback:
         return new_rank_list
 
     def get_DTC_based_feedback(self, q, rel_items, irl_items, obj_feature_matrix, m):
-        q_new=self.compute_new_query_vector(q_old=q,relevant_items=rel_items,irrel_items=irl_items)
-        X_train,Y_train=self.create_X_Y_as_np_matrix(rel_items=rel_items,irl_items=irl_items)
+        q_new = self.compute_new_query_vector(q_old=q, relevant_items=rel_items, irrel_items=irl_items)
+        X_train, Y_train = self.create_X_Y_as_np_matrix(rel_items=rel_items, irl_items=irl_items)
 
-        #Training SVM classifier
+        # Training SVM classifier
         dtl = decision_tree_learning.DecisionTreeLearning()
-        dtl.fit(X=X_train,y=Y_train)
+        dtl.fit(X=X_train, y=Y_train)
 
         # Now getting more test data from LSH indexes
-        test_dataset=read_from_pickle('test_dataset.pickle')
-        X_test,imageNames=self.create_X_test_as_np_matrix(test_dataset=test_dataset)
+        test_dataset = read_from_pickle('test_dataset.pickle')
+        X_test, imageNames = self.create_X_test_as_np_matrix(test_dataset=test_dataset)
         Y_pred = dtl.predict(u=X_test)
-        relevant_pred_img_names=[imageNames[i] for i in range(0,len(Y_pred)) if Y_pred[i]==1]
-        new_obj_feature_matrix= self.database_connection.HOG_descriptor_from_image_ids(image_ids=relevant_pred_img_names)
+        relevant_pred_img_names = [imageNames[i] for i in range(0, len(Y_pred)) if Y_pred[i] == 1]
 
-        new_rank_list=get_most_m_similar_images(data_with_images=new_obj_feature_matrix,query_image_feature_vector=q_new,m=m)
+        length_relevant_images = len(relevant_pred_img_names)
+        if length_relevant_images < m:
+            irr_image_names = [imageNames[i] for i in range(0, m - length_relevant_images) if Y_pred[i] == -1]
+            relevant_pred_img_names.extend(irr_image_names)
+
+        new_obj_feature_matrix = self.database_connection.HOG_descriptor_from_image_ids(
+            image_ids=relevant_pred_img_names)
+
+        new_rank_list = get_most_m_similar_images(data_with_images=new_obj_feature_matrix,
+                                                  query_image_feature_vector=q_new, m=m)
         return new_rank_list
 
     def get_PPR_based_feedback(self, q, rel_items, irl_items, obj_feature_matrix, m):
@@ -247,6 +259,7 @@ class RelevanceFeedback:
             imageNames.append(item[0])
 
         return np.array(X), imageNames
+
 
 if __name__ == '__main__':
     rf = RelevanceFeedback()
